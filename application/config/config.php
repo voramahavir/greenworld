@@ -26,6 +26,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $config['base_url'] = '';
 
 /*
+|	set default timezone
+*/
+date_default_timezone_set('Asia/Kolkata');
+
+
+/*
 |--------------------------------------------------------------------------
 | Index File
 |--------------------------------------------------------------------------
