@@ -127,4 +127,24 @@ class UserModel extends CI_Model {
             $this->db->insert("device_details",$data);
         }
     }
+
+    public function connectorfollow(){
+    	$data = $this->input->post(array('connected_by', 'connected_to','type'));
+		if (!isset($data['connected_to']) || empty($data['connected_to'])) {
+			$output = array('code' => 0, 'message' => "connected_to missing.");
+		} else if (!isset($data['connected_by']) || empty($data['connected_by'])) {
+			$output = array('code' => 0, 'message' => "connected_by missing.");
+		}  else if (!isset($data['type']) || empty($data['type'])) {
+			$output = array('code' => 0, 'message' => "Type of connection missing.");
+		} else {
+			$res = $this->db->insert("connect",$data);
+			if ($res) {
+				$output = array('code' => 1, 'message' => "Users gets connected Successfully");
+			} else {
+				$output = array('code' => 0, 'message' => "Oops, Error in creating connection between two user.");
+			}
+		}
+		echo json_encode($output);
+		exit;
+    }
 }

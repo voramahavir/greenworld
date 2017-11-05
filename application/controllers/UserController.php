@@ -24,6 +24,11 @@ class UserController extends CI_Controller {
 		$this->UserModel->register();
 	}
 
+	public function connectorfollow(){
+		$this->load->model('UserModel');
+		$this->UserModel->connectorfollow();
+	}
+	
 	public function logout() {
 		logout();
 	}
