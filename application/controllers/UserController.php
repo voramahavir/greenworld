@@ -28,8 +28,23 @@ class UserController extends CI_Controller {
 		$this->load->model('UserModel');
 		$this->UserModel->connectorfollow();
 	}
-	
-	public function logout() {
-		logout();
+
+	public function list(){
+		$this->load->view('users/list');
+	}
+
+	public function get(){
+		$this->load->model('UserModel');
+		$this->UserModel->getUserData();
+	}
+
+	public function delete($id=""){
+		$this->load->model('UserModel');
+		$this->UserModel->deleteUser($id);
+	}
+
+	public function recover($id=""){
+		$this->load->model('UserModel');
+		$this->UserModel->recoverUser($id);
 	}
 }

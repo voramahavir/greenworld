@@ -96,4 +96,69 @@ class UserModel extends CI_Model {
 		echo json_encode($output);
 		exit;
     }
+
+    public function getUserData(){
+        $search = array('value' => '');
+        if (isset($_POST['search'])) {
+            $search = $_POST['search'];
+        }
+        if (isset($search['value'])) {
+            $search = $search['value'];
+        }
+        $start = 0;
+        if (isset($_POST['start'])) {
+            $start = $_POST['start'];
+        }
+        $length = 10;
+        if (isset($_POST['length'])) {
+            $length = $_POST['length'];
+        }
+        $draw = 1;
+        if (isset($_POST['draw'])) {
+            $draw = $_POST['draw'];
+        }
+
+        $output = array("code" => 0,
+            'draw' => $draw,
+            'recordsTotal' => 0,
+            'recordsFiltered' => 0,
+            'search' => $search
+        );
+        if(!empty($search)){$this->db->like("user_name",$search);}
+        $output['data'] = $this->db->select('*')->get('users')->result();
+        if(!empty($search)){$this->db->like("user_name",$search);}
+        $output['recordsTotal']=$this->db->get('users')->num_rows();
+        $output['recordsFiltered']=$output['recordsTotal'];
+        if (!empty($output['data'])) {
+            $output['code'] = 1;
+        }
+        echo json_encode($output);
+        exit;
+    }
+
+    public function deleteUser($id)
+    {
+        $code = 0;
+        $response = "";
+        $this->db->where('user_id', $id)->set(array(
+            'is_active' => 0
+        ))->update("users");
+        $code = 1;
+        $response = "User deleted successfully.";
+        echo json_encode(array("code" => $code, "response" => $response));
+        exit();
+    }
+
+    public function recoverUser($id)
+    {
+        $code = 0;
+        $response = "";
+        $this->db->where('user_id', $id)->set(array(
+            'is_active' => 1
+        ))->update("users");
+        $code = 1;
+        $response = "User recovered successfully.";
+        echo json_encode(array("code" => $code, "response" => $response));
+        exit();
+    }
 }

@@ -22,4 +22,16 @@ class Welcome extends CI_Controller {
 	// {
 	// 	$this->load->view('welcome_message');
 	// }
+
+	function __construct() {
+		parent::__construct();
+		if (!access()) {
+			logout();
+		}
+	}
+
+	public function index() {
+		$data['page_title'] = 'Dashboard';
+		$this->load->view('dashboard', $data);
+	}
 }
