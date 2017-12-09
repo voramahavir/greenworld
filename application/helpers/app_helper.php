@@ -110,3 +110,17 @@ if (!function_exists('getSessionData')) {
         return ($key) ? $sessData[$key] : $sessData;
     }
 }
+
+if (!function_exists('checkParams')) {
+
+    function checkParams($post)
+    {
+        $msg = '';
+        foreach ($post as $param_name => $param_val) {
+            if(empty($param_val)){
+                $msg .= "$param_name is missing,";
+            }
+        }
+        return $msg;
+    }
+}

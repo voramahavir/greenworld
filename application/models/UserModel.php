@@ -8,18 +8,8 @@ class UserModel extends CI_Model {
 		$this->load->database();
 	}
 
-    public function checkParams($post){
-        $msg = '';
-        foreach ($post as $param_name => $param_val) {
-            if(empty($param_val)){
-                $msg .= "$param_name is missing,";
-            }
-        }
-        return $msg;
-    }
-
 	public function verify() {
-        $msg = $this->checkParams($_POST);
+        $msg = checkParams($_POST);
         $res = [];
 		if (empty($msg)) {
 			$this->db->select('user_id,first_name,last_name,email,user_name,phone_no');
@@ -44,7 +34,7 @@ class UserModel extends CI_Model {
 	public function register(){
         $data = array();
         $success = false;
-        $msg = $this->checkParams($_POST);
+        $msg = checkParams($_POST);
 
         if (empty($msg)) {
             $q = $this->db->or_where(array(
@@ -54,14 +44,28 @@ class UserModel extends CI_Model {
             if($num_rows>0){
                 $msg = "User already exist.";
             }else{
-                $this->db->insert("users",$_POST);
-                if($this->db->insert_id()){
-                	$id = $this->db->insert_id();
-                    $success = true;
-                    $msg = "User registered successfully.";
-                    $data = $this->db->select('user_id,first_name,last_name,email,user_name,phone_no')->where('user_id',$id)->get("users")->first_row();
-                }else{
-                    $msg = "Oops! error registering user.";
+                $target_path = './assets/profilePics/';
+                if (!file_exists($target_path)) {
+                    mkdir($target_path, 0777, true);
+                }
+                if (isset($_FILES['image']['name'])) {
+                    $target_path = $target_path . '/'. md5(''.time()) . end((explode(".", $_FILES['image']['name'])));
+                    if (move_uploaded_file($_FILES['image']['tmp_name'], $target_path)) {
+                        $_POST['image_url'] = '/assets/profilePics/'. md5(''.time()) . end((explode(".", $_FILES['image']['name'])));
+                    } else {
+                        $msg = "Error in uploading file, Try again.";
+                    }
+                }
+                if(empty($msg)){
+                    $this->db->insert("users",$_POST);
+                    if($this->db->insert_id()){
+                    	$id = $this->db->insert_id();
+                        $success = true;
+                        $msg = "User registered successfully.";
+                        $data = $this->db->select('user_id,first_name,last_name,email,user_name,phone_no')->where('user_id',$id)->get("users")->first_row();
+                    }else{
+                        $msg = "Oops! error registering user.";
+                    }
                 }
             }
         }
@@ -70,7 +74,7 @@ class UserModel extends CI_Model {
 	}
 
     public function connectorfollow(){
-        $msg = $this->checkParams($_POST);
+        $msg = checkParams($_POST);
         if (empty($msg)) {
             $connected_by = $this->db->where('user_id',$_POST['connected_by'])->get('users')->result();
             $connected_to = $this->db->where('user_id',$_POST['connected_to'])->get('users')->result();

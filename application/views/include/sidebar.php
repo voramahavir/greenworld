@@ -24,6 +24,11 @@
             <i class="fa fa-users"></i> <span>Users</span>
           </a>
         </li>
+        <li class="<?php echo isset($page_title) && $page_title == 'Nursery' ? ' active' : ''; ?>">
+          <a href="<?php echo site_url('nursery/list'); ?>">
+            <i class="fa fa-users"></i> <span>Nursery</span>
+          </a>
+        </li>
       </ul>
     </section>
     <!-- /.sidebar -->
