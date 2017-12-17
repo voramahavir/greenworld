@@ -142,27 +142,57 @@ class UserModel extends CI_Model {
 
     public function deleteUser($id)
     {
-        $code = 0;
-        $response = "";
+        $msg = "";
         $this->db->where('user_id', $id)->set(array(
             'is_active' => 0
         ))->update("users");
-        $code = 1;
-        $response = "User deleted successfully.";
-        echo json_encode(array("code" => $code, "response" => $response));
+        $success = true;
+        $msg = "User deleted successfully.";
+        echo json_encode(array("success" => $success, "msg" => $msg));
         exit();
     }
 
     public function recoverUser($id)
     {
-        $code = 0;
-        $response = "";
+        $msg = "";
         $this->db->where('user_id', $id)->set(array(
             'is_active' => 1
         ))->update("users");
-        $code = 1;
-        $response = "User recovered successfully.";
-        echo json_encode(array("code" => $code, "response" => $response));
+        $success = true;
+        $msg = "User recovered successfully.";
+        echo json_encode(array("success" => $success, "msg" => $msg));
         exit();
+    }
+
+    public function getData($id='')
+    {
+        $success = false;
+        $this->db->where('user_id', $id);
+        $response = $this->db->select('user_id,first_name,last_name,email,user_name,phone_no,bio,sex,user_type,birth_date')->get('users')->first_row();
+        if($response != null){
+            $success = true;
+            $msg = 'Data fetched successfully';
+        } else {
+            $msg = 'User does not exist.';
+        }
+        echo json_encode(array("success" => $success, "msg" => $msg, "response" => $response));
+        exit();
+    }
+
+    public function updateUser($id='')
+    {
+        $success = false;
+        $msg = checkParams($_POST);
+        if(!empty($msg)){
+            $this->db->where('user_id', $id);
+            $count = $this->db->set($_POST)->update('users');
+            if($count > 0){
+                $success = true;
+                $msg = 'User details updated successfully';
+            }else{
+                $msg = 'Error updating user details, Try again.';
+            }
+        }
+        echo json_encode(array("success" => $success, "msg" => $msg));
     }
 }

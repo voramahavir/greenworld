@@ -5,6 +5,7 @@ class PlantController extends CI_Controller {
 
 	function __construct() {
 		parent::__construct();
+		$this->load->model('PlantModel');
 	}
 
 	public function index() {
@@ -14,18 +15,35 @@ class PlantController extends CI_Controller {
 		// $this->load->view('login');
 	}
 
+	public function list(){
+		$this->load->view('plant/list');
+	}
+
 	public function add() {
-		$this->load->model('PlantModel');
 		$this->PlantModel->add();
 	}
 
 	public function get() {
-		$this->load->model('PlantModel');
 		$this->PlantModel->getPlants();
 	}
 
+	public function delete($id=""){
+		$this->PlantModel->deletePlant($id);
+	}
+
+	public function recover($id=""){
+		$this->PlantModel->recoverPlant($id);
+	}
+
+	public function edit($id=""){
+		$this->PlantModel->updatePlant($id);
+	}
+
 	public function addUserPlant() {
-		$this->load->model('PlantModel');
 		$this->PlantModel->addUserPlant();
+	}
+
+	public function import() {
+		$this->PlantModel->bulkUpload();
 	}
 }

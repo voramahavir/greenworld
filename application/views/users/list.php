@@ -13,13 +13,13 @@
             </div>
             <div class="box-body">
                 <div class="dataTables_wrapper">
-<!--                   <div class="row form-group">
+                  <div class="row form-group">
                     <div class="col-md-12">
-                      <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-default">
+                      <a href="<?php echo site_url('users/addUser'); ?>" class="btn btn-info">
                         <span class="glyphicon glyphicon-plus"></span> Add New User
-                      </button>
+                      </a>
                     </div>
-                  </div> -->
+                  </div>
                   <div class="row">
                     <div class="col-md-12">
                       <table class="table table-bordered table-hover dataTable" id="table_users">
@@ -173,7 +173,7 @@
       $("#recoverUserModal").find("[name=id]").attr("value",id);
     }
     function EditTheRow(index,id){
-      window.location.href = "<?php echo site_url('users/edit/'); ?>"+id;
+      window.location.href = "<?php echo site_url('users/editUser/'); ?>"+id;
     }
     $(".deleteUser").on("click",function(){
         $(".deleteUser").prop("disabled",true);

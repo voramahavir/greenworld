@@ -70,3 +70,6 @@ $route['posts/(:any)/(:any)'] = 'PostController/$1/$2';
 $route['nursery'] = 'NurseryController';
 $route['nursery/(:any)'] = 'NurseryController/$1';
 $route['nursery/(:any)/(:any)'] = 'NurseryController/$1/$2';
+$route['plant_category'] = 'PlantCategoryController';
+$route['plant_category/(:any)'] = 'PlantCategoryController/$1';
+$route['plant_category/(:any)/(:any)'] = 'PlantCategoryController/$1/$2';

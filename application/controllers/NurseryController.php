@@ -5,6 +5,7 @@ class NurseryController extends CI_Controller {
 
 	function __construct() {
 		parent::__construct();
+		$this->load->model('NurseryModel');
 	}
 
 	public function index() {
@@ -19,22 +20,26 @@ class NurseryController extends CI_Controller {
 	}
 
 	public function add() {
-		$this->load->model('NurseryModel');
 		$this->NurseryModel->add();
 	}
 
 	public function get() {
-		$this->load->model('NurseryModel');
 		$this->NurseryModel->get();
 	}
 
 	public function delete($id=""){
-		$this->load->model('NurseryModel');
 		$this->NurseryModel->deleteNursery($id);
 	}
 
 	public function recover($id=""){
-		$this->load->model('NurseryModel');
 		$this->NurseryModel->recoverNursery($id);
+	}
+
+	public function edit($id=""){
+		$this->NurseryModel->updateNursery($id);
+	}
+
+	public function import(){
+		$this->NurseryModel->importBulkNursery();
 	}
 }

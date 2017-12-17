@@ -33,6 +33,15 @@ class UserController extends CI_Controller {
 		$this->load->view('users/list');
 	}
 
+	public function addUser(){
+		$this->load->view('users/add_user');
+	}
+
+	public function editUser($id=""){
+		$data['id'] = $id;
+		$this->load->view('users/edit_user',$data);
+	}
+
 	public function get(){
 		$this->load->model('UserModel');
 		$this->UserModel->getUserData();
@@ -46,5 +55,17 @@ class UserController extends CI_Controller {
 	public function recover($id=""){
 		$this->load->model('UserModel');
 		$this->UserModel->recoverUser($id);
+	}
+
+	public function update($id='')
+	{
+		$this->load->model('UserModel');
+		$this->UserModel->updateUser($id);
+	}
+
+	public function getUserData($id='')
+	{
+		$this->load->model('UserModel');
+		$this->UserModel->getData($id);
 	}
 }

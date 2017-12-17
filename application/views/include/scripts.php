@@ -37,6 +37,10 @@
 <script src="<?php echo base_url('assets/theme/bower_components/fastclick/lib/fastclick.js'); ?>"></script>
 <!-- AdminLTE App -->
 <script src="<?php echo base_url('assets/theme/dist/js/adminlte.min.js'); ?>"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/additional-methods.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/additional-methods.min.js"></script>
 <script type="text/javascript">
     var base_url = "<?php echo base_url(); ?>";
     var site_url = "<?php echo site_url(); ?>/";

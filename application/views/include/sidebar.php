@@ -29,6 +29,16 @@
             <i class="fa fa-users"></i> <span>Nursery</span>
           </a>
         </li>
+        <li class="<?php echo isset($page_title) && $page_title == 'Plants' ? ' active' : ''; ?>">
+          <a href="<?php echo site_url('plant/list'); ?>">
+            <i class="fa fa-users"></i> <span>Plants</span>
+          </a>
+        </li>
+        <li class="<?php echo isset($page_title) && $page_title == 'Plant Categories' ? ' active' : ''; ?>">
+          <a href="<?php echo site_url('plant_category/list'); ?>">
+            <i class="fa fa-users"></i> <span>Plant Categories</span>
+          </a>
+        </li>
       </ul>
     </section>
     <!-- /.sidebar -->
