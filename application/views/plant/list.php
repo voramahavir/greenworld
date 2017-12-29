@@ -34,7 +34,6 @@
                             <th>Name</th>
                             <th>Category</th>
                             <th>Description</th>
-                            <th>QR Code</th>
                             <th>Image</th>
                             <th>Action</th>
                           </tr>
@@ -86,7 +85,7 @@
                           <div class="row form-group" style="display:none">
                               <label class="col-md-3 text-right"> QR Code : </label>
                               <div class="col-md-9">
-                                  <input type="text" class="form-control qrcode" name="qrcode" value="fd">
+                                  <input type="text" class="form-control qrcode" name="qrcode" value="">
                               </div>
                           </div>
                           <div class="row form-group">
@@ -151,7 +150,7 @@
                           <div class="row form-group" style="display:none">
                               <label class="col-md-3 text-right"> QR Code : </label>
                               <div class="col-md-9">
-                                  <input type="text" class="form-control qrcode" name="qrcode" value="fd">
+                                  <input type="text" class="form-control qrcode" name="qrcode" value="">
                               </div>
                           </div>
                           <div class="row form-group">
@@ -321,10 +320,6 @@
                 "bSortable": false
               },
               {
-                "data": 'qrcode', 
-                "bSortable": false
-              },
-              {
                 "data": null, 
                 "bSortable": false
               },
@@ -340,7 +335,7 @@
               data.push(aData);
               userid = 1;
               base_url = "<?php echo base_url(); ?>"+aData.image_url;
-              $('td:eq(4)',nRow).html(""
+              $('td:eq(3)',nRow).html(""
                   +"<img style='height:50px; widht:50px;' src='"+base_url+"'/>"
               +"");
               if(aData.is_active==1){
@@ -355,7 +350,7 @@
                   //     +"");
                   // }
                   // else{
-                      $('td:eq(5)',nRow).html(""
+                      $('td:eq(4)',nRow).html(""
                           +"<button class='btn btn-info' onclick='return EditTheRow("+iDisplayindex+","+aData.id+");'>"
                           +"<i class='fa fa-edit'></i>"
                           +"</button>"
@@ -367,7 +362,7 @@
 
               }else{
                   $(nRow).addClass('danger');
-                  $('td:eq(5)',nRow).html(""
+                  $('td:eq(4)',nRow).html(""
                       +"<button class='btn btn-info' disabled onclick='return EditTheRow("+iDisplayindex+","+aData.id+");'>"
                       +"<i class='fa fa-edit'></i>"
                       +"</button>"

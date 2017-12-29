@@ -12,40 +12,40 @@ class NurseryModel extends CI_Model {
         $plants = !empty($_GET['plant']) ? explode(',', $_GET['plant']) : '';
         $data = array();
         $success = false;
-        $msg = checkParams($_POST);
+        $msg = checkParams($_POST,'name,contact_no');
         unset($_POST['plant']);
         if (empty($msg)) {
             $target_path = './assets/nursery/';
             if (!file_exists($target_path)) {
                 mkdir($target_path, 0777, true);
             }
-            if (isset($_FILES['image']['name'])) {
+            if (isset($_FILES['image']['name']) && !empty($_FILES['image']['name'])) {
                 $exp = explode(".", $_FILES['image']['name']);
                 $extension = end($exp);
                 $file_name = md5(''.time());
                 $target_path = $target_path . '/'. $file_name .'.'. $extension ;
                 if (move_uploaded_file($_FILES['image']['tmp_name'], $target_path)) {
                     $_POST['image_url'] = '/assets/nursery/'. $file_name. '.'.$extension;
-                    $this->db->insert("nursery",$_POST);
-                    if($this->db->insert_id()){
-                        if($plants != ''){
-                            $data = array();
-                            for ($i=0; $i < count($plants); $i++) { 
-                                $arr = array('plant_id' => $plants[$i], 'nursery_id' => $this->db->insert_id());
-                                array_push($data, $arr);
-                            }
-                            $this->db->insert_batch("plant_nursery_link",$data);
-                        }
-                        $success = true;
-                        $msg = "Nursery added successfully.";
-                    }else{
-                        $msg = "Oops! error adding nursery.";
-                    }
                 } else {
                     $msg = "Error in uploading file, Try again.";
                 }
-            } else {
-                $msg = "File missing.";
+            } 
+            if(empty($msg)){
+                $this->db->insert("nursery",$_POST);
+                if($this->db->insert_id()){
+                    if($plants != ''){
+                        $data = array();
+                        for ($i=0; $i < count($plants); $i++) { 
+                            $arr = array('plant_id' => $plants[$i], 'nursery_id' => $this->db->insert_id());
+                            array_push($data, $arr);
+                        }
+                        $this->db->insert_batch("plant_nursery_link",$data);
+                    }
+                    $success = true;
+                    $msg = "Nursery added successfully.";
+                }else{
+                    $msg = "Oops! error adding nursery.";
+                }
             }
         }
         echo json_encode(array("success" => $success,"msg" => $msg));
@@ -133,7 +133,7 @@ class NurseryModel extends CI_Model {
         unset($_POST['plant']);
         $data = array();
         $success = false;
-        $msg = checkParams($_POST);
+        $msg = checkParams($_POST,'name,contact_no');
         if (empty($msg)) {
             $target_path = './assets/nursery/';
             if (!file_exists($target_path)) {
