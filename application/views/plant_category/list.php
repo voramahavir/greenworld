@@ -240,7 +240,7 @@
         $.post("<?php echo site_url('plant_category/delete/'); ?>"+id,{})
         .done(function(result){
             result=JSON.parse(result);
-            if(result.code==1){
+            if(result.success==true){
                 table.ajax.reload();
             }
             $("#deleteCategoryModal").modal("hide");
@@ -254,7 +254,7 @@
         $.post("<?php echo site_url('plant_category/recover/'); ?>"+id,{})
         .done(function(result){
             result=JSON.parse(result);
-            if(result.code==1){
+            if(result.success==true){
                 table.ajax.reload();
             }
             $("#recoverCategoryModal").modal("hide");

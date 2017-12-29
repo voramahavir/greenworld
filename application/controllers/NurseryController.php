@@ -42,4 +42,8 @@ class NurseryController extends CI_Controller {
 	public function import(){
 		$this->NurseryModel->importBulkNursery();
 	}
+
+	public function nearByNursery(){
+		$this->NurseryModel->nearByNursery();
+	}
 }

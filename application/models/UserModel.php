@@ -8,19 +8,19 @@ class UserModel extends CI_Model {
 		$this->load->database();
 	}
 
-	public function verify() {
-        $msg = checkParams($_POST);
+	public function login() {
+        $msg = checkParams($_POST,'user_name,password');
         $res = [];
 		if (empty($msg)) {
-			$this->db->select('user_id,first_name,last_name,email,user_name,phone_no');
-			$this->db->or_where('user_name',$_POST['user_name']);
-			$this->db->or_where('email',$_POST['user_name']);
-			$this->db->or_where('phone_no',$_POST['user_name']);
-			$this->db->where('password',md5($_POST['password']));
-			$this->db->where('is_active',1);
-			$res = $this->db->get('users')->first_row();
+            $user_name = $_POST['user_name'];
+            $password = md5($_POST['password']);
+			$res = $this->db->query("SELECT user_id, first_name, last_name, email, user_name, phone_no FROM users WHERE (user_name = '".$user_name."' OR email = '".$user_name."' OR phone_no = '".$user_name."') AND password = '".$password."' AND is_active = 1")->result();
 			if (count($res)) {
 				$output = array('success' => true, 'message' => "Login Successfully", 'data' => (object)$res);
+                if(isset($_POST['latitude']) && isset($_POST['longitude'])){
+                    $this->db->where('user_id', $res->user_id);
+                    $count = $this->db->update("users",array('latitude' => $_POST['latitude'], 'longitude' => $_POST['longitude']));
+                }
 			} else {
 				$output = array('success' => false, 'message' => "Invalid Credentials", 'data' => (object)$res);
 			}
@@ -34,11 +34,10 @@ class UserModel extends CI_Model {
 	public function register(){
         $data = array();
         $success = false;
-        $msg = checkParams($_POST);
-
+        $msg = checkParams($_POST,'first_name,last_name,phone_no,email,password,birth_date');
         if (empty($msg)) {
             $q = $this->db->or_where(array(
-                'email' => $_POST['email'],'phone_no' => $_POST['phone_no'],'user_name' => $_POST['user_name']
+                'email' => $_POST['email'],'phone_no' => $_POST['phone_no']
             ))->get("users");
             $num_rows = $q->num_rows();
             if($num_rows>0){
@@ -49,9 +48,12 @@ class UserModel extends CI_Model {
                     mkdir($target_path, 0777, true);
                 }
                 if (isset($_FILES['image']['name'])) {
-                    $target_path = $target_path . '/'. md5(''.time()) . end((explode(".", $_FILES['image']['name'])));
+                    $exp = explode(".", $_FILES['image']['name']);
+                    $extension = end($exp);
+                    $file_name = md5(''.time());
+                    $target_path = $target_path . '/'. $file_name .'.'. $extension ;
                     if (move_uploaded_file($_FILES['image']['tmp_name'], $target_path)) {
-                        $_POST['image_url'] = '/assets/profilePics/'. md5(''.time()) . end((explode(".", $_FILES['image']['name'])));
+                        $_POST['profile_pic'] = '/assets/profilePics/'. $file_name .'.'.$extension;
                     } else {
                         $msg = "Error in uploading file, Try again.";
                     }
@@ -142,24 +144,34 @@ class UserModel extends CI_Model {
 
     public function deleteUser($id)
     {
+        $success = false;
         $msg = "";
-        $this->db->where('user_id', $id)->set(array(
+        $count = $this->db->where('user_id', $id)->set(array(
             'is_active' => 0
         ))->update("users");
-        $success = true;
-        $msg = "User deleted successfully.";
+        if($count > 0){
+            $success = true;
+            $msg = "User deleted successfully.";
+        } else{
+            $msg = "Error deleting user,Try again.";
+        }
         echo json_encode(array("success" => $success, "msg" => $msg));
         exit();
     }
 
     public function recoverUser($id)
     {
+        $success = false;
         $msg = "";
-        $this->db->where('user_id', $id)->set(array(
+        $count = $this->db->where('user_id', $id)->set(array(
             'is_active' => 1
         ))->update("users");
-        $success = true;
-        $msg = "User recovered successfully.";
+        if($count > 0){
+            $success = true;
+            $msg = "User recovered successfully.";
+        } else{
+            $msg = "Error recovering user,Try again.";
+        }
         echo json_encode(array("success" => $success, "msg" => $msg));
         exit();
     }
@@ -168,7 +180,7 @@ class UserModel extends CI_Model {
     {
         $success = false;
         $this->db->where('user_id', $id);
-        $response = $this->db->select('user_id,first_name,last_name,email,user_name,phone_no,bio,sex,user_type,birth_date')->get('users')->first_row();
+        $response = $this->db->select('user_id,first_name,last_name,email,user_name,phone_no,bio,sex,user_type,birth_date,profile_pic')->get('users')->first_row();
         if($response != null){
             $success = true;
             $msg = 'Data fetched successfully';
@@ -183,9 +195,24 @@ class UserModel extends CI_Model {
     {
         $success = false;
         $msg = checkParams($_POST);
-        if(!empty($msg)){
+        if(empty($msg)){
+            $target_path = './assets/profilePics/';
+            if (!file_exists($target_path)) {
+                mkdir($target_path, 0777, true);
+            }
+            if (isset($_FILES['image']['name'])) {
+                $exp = explode(".", $_FILES['image']['name']);
+                $extension = end($exp);
+                $file_name = md5(''.time());
+                $target_path = $target_path . '/'. $file_name .'.'. $extension ;
+                if (move_uploaded_file($_FILES['image']['tmp_name'], $target_path)) {
+                    $_POST['profile_pic'] = '/assets/profilePics/'. $file_name .'.'.$extension;
+                } else {
+                    $msg = "Error in uploading file, Try again.";
+                }
+            }
             $this->db->where('user_id', $id);
-            $count = $this->db->set($_POST)->update('users');
+            $count = $this->db->update("users",$_POST);
             if($count > 0){
                 $success = true;
                 $msg = 'User details updated successfully';
@@ -194,5 +221,24 @@ class UserModel extends CI_Model {
             }
         }
         echo json_encode(array("success" => $success, "msg" => $msg));
+        exit();
+    }
+
+    public function updateLatLong($id='')
+    {
+        $success = true;
+        $msg = checkParams($_POST,'latitude,longitude');
+        if(!empty($id) && empty($msg)){
+            $this->db->where('user_id', $id);
+            $count = $this->db->update("users",$_POST);
+            if($count > 0){
+                $success = true;
+                $msg = 'Location updated successfully';
+            }else{
+                $msg = 'Error updating location, Try again.';
+            }
+        }
+        echo json_encode(array("success" => $success, "msg" => $msg));
+        exit();
     }
 }

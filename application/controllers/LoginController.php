@@ -14,7 +14,7 @@ class LoginController extends CI_Controller {
 		$this->load->view('login');
 	}
 
-	public function verify() {
+	public function login() {
 		$this->load->model('LoginModel');
 		$this->LoginModel->verify();
 	}

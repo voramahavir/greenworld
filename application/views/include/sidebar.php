@@ -39,6 +39,11 @@
             <i class="fa fa-users"></i> <span>Plant Categories</span>
           </a>
         </li>
+        <li class="<?php echo isset($page_title) && $page_title == 'Bills' ? ' active' : ''; ?>">
+          <a href="<?php echo site_url('bills/list'); ?>">
+            <i class="fa fa-users"></i> <span>Bills</span>
+          </a>
+        </li>
       </ul>
     </section>
     <!-- /.sidebar -->

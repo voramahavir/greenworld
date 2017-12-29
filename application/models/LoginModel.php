@@ -12,9 +12,9 @@ class LoginModel extends CI_Model {
 		$data = $this->input->post(array('user_name', 'password'));
 
 		if (!isset($data['user_name']) || empty($data['user_name'])) {
-			$output = array('code' => 0, 'message' => "Username missing");
+			$output = array('success' => false, 'msg' => "Username missing");
 		} else if (!isset($data['password']) || empty($data['password'])) {
-			$output = array('code' => 0, 'message' => "Password missing");
+			$output = array('success' => false, 'msg' => "Password missing");
 		} else {
 			$this->db->select('id, user_name');
 			$data['user_name'] = $data['user_name'];
@@ -23,9 +23,9 @@ class LoginModel extends CI_Model {
 			$res = $this->db->get_where('admin_users', $data)->result_array();
 			if (count($res)) {
 				$this->session->set_userdata(array('access' => $res[0]));
-				$output = array('code' => 1, 'message' => "Login Successfully");
+				$output = array('success' => true, 'msg' => "Login Successfully");
 			} else {
-				$output = array('code' => 0, 'message' => "Invalid Credentials");
+				$output = array('success' => false, 'msg' => "Invalid Credentials");
 			}
 		}
 		echo json_encode($output);

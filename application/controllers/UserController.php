@@ -14,9 +14,9 @@ class UserController extends CI_Controller {
 		// $this->load->view('login');
 	}
 
-	public function verify() {
+	public function login() {
 		$this->load->model('UserModel');
-		$this->UserModel->verify();
+		$this->UserModel->login();
 	}
 
 	public function register(){
@@ -67,5 +67,11 @@ class UserController extends CI_Controller {
 	{
 		$this->load->model('UserModel');
 		$this->UserModel->getData($id);
+	}
+
+	public function updateLatLong($id='')
+	{
+		$this->load->model('UserModel');
+		$this->UserModel->updateLatLong($id);
 	}
 }

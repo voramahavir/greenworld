@@ -67,27 +67,35 @@ class PlantCategoryModel extends CI_Model {
 
     public function deletePlantCategory($id)
     {
-        $code = 0;
-        $response = "";
-        $this->db->where('id', $id)->set(array(
+        $success = false;
+        $msg = "";
+        $count = $this->db->where('id', $id)->set(array(
             'is_active' => 0
         ))->update("plant_category");
-        $code = 1;
-        $response = "Plant Category deleted successfully.";
-        echo json_encode(array("code" => $code, "response" => $response));
+        if($count > 0){
+            $success = true;
+            $msg = "Plant Category deleted successfully.";
+        } else{
+            $msg = "Error deleting Plant Category,Try again.";
+        }
+        echo json_encode(array("success" => $success, "msg" => $msg));
         exit();
     }
 
     public function recoverPlantCategory($id)
     {
-        $code = 0;
-        $response = "";
-        $this->db->where('id', $id)->set(array(
+        $success = false;
+        $msg = "";
+        $count = $this->db->where('id', $id)->set(array(
             'is_active' => 1
         ))->update("plant_category");
-        $code = 1;
-        $response = "Plant Category recovered successfully.";
-        echo json_encode(array("code" => $code, "response" => $response));
+        if($count > 0){
+            $success = true;
+            $msg = "Plant Category recovered successfully.";
+        } else{
+            $msg = "Error recovering Plant Category,Try again.";
+        }
+        echo json_encode(array("success" => $success, "msg" => $msg));
         exit();
     }
 

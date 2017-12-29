@@ -23,8 +23,8 @@ class PlantController extends CI_Controller {
 		$this->PlantModel->add();
 	}
 
-	public function get() {
-		$this->PlantModel->getPlants();
+	public function get($id="") {
+		$this->PlantModel->getPlants($id);
 	}
 
 	public function delete($id=""){

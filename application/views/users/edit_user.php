@@ -19,55 +19,55 @@
                                 <div class="row form-group">
                                       <label class="col-md-2"> First Name : </label>
                                       <div class="col-md-5">
-                                          <input type="text" class="form-control first_name" name="first_name" required>
+                                          <input type="text" class="form-control first_name" name="first_name">
                                       </div>
                                 </div>
                                 <div class="row form-group">
                                       <label class="col-md-2"> Last Name : </label>
                                       <div class="col-md-5">
-                                          <input type="text" class="form-control last_name" name="last_name" required>
+                                          <input type="text" class="form-control last_name" name="last_name">
                                       </div>
                                 </div>
                                 <div class="row form-group">
                                       <label class="col-md-2"> User Name : </label>
                                       <div class="col-md-5">
-                                          <input type="text" class="form-control user_name" name="user_name" required>
+                                          <input type="text" class="form-control user_name" name="user_name">
                                       </div>
                                 </div>
                                 <div class="row form-group">
                                       <label class="col-md-2"> Email : </label>
                                       <div class="col-md-5">
-                                          <input type="text" class="form-control email" name="email" required>
+                                          <input type="text" class="form-control email" name="email">
                                       </div>
                                 </div>
                                 <div class="row form-group">
                                       <label class="col-md-2"> Phone No : </label>
                                       <div class="col-md-5">
-                                          <input type="text" class="form-control phone_no" name="phone_no" required>
+                                          <input type="text" class="form-control phone_no" name="phone_no">
                                       </div>
                                 </div>
                                 <div class="row form-group">
                                       <label class="col-md-2"> Bio : </label>
                                       <div class="col-md-5">
-                                          <textarea type="text" class="form-control bio" name="bio" required></textarea>
+                                          <textarea type="text" class="form-control bio" name="bio"></textarea>
                                       </div>
                                 </div>
                                 <div class="row form-group">
                                       <label class="col-md-2"> City : </label>
                                       <div class="col-md-5">
-                                          <input type="text" class="form-control city" name="city" required>
+                                          <input type="text" class="form-control city" name="city">
                                       </div>
                                 </div>
                                 <div class="row form-group">
                                     <label class="col-md-2">D.O.B. :</label>
                                     <div class="col-md-5">
-                                        <input type="text" value="" class="form-control birth_date" name="birth_date" required>
+                                        <input type="text" value="" class="form-control birth_date" name="birth_date">
                                     </div>
                                 </div>
                                 <div class="row form-group">
                                       <label class="col-md-2"> Gender : </label>
                                       <div class="col-md-5">
-                                          <select class="form-control select sex" name='sex' required>
+                                          <select class="form-control select sex" name='sex'>
                                               <option value="1">Male</option>
                                               <option value="2">Female</option>
                                           </select>
@@ -76,7 +76,7 @@
                                 <div class="row form-group">
                                       <label class="col-md-2"> User Type : </label>
                                       <div class="col-md-5">
-                                          <select class="form-control select user_type" name='user_type' required>
+                                          <select class="form-control select user_type" name='user_type'>
                                               <option value="1">General</option>
                                               <option value="2">Expert User</option>
                                           </select>
@@ -85,8 +85,20 @@
                                 <div class="row form-group">
                                       <label class="col-md-2"> Password : </label>
                                       <div class="col-md-5">
-                                          <input type="password" class="form-control password" name="password" required>
+                                          <input type="password" class="form-control password" name="password">
                                       </div>
+                                </div>
+                                <div class="row form-group">
+                                    <label class="col-md-2"> Image : </label>
+                                    <div class="col-md-5">
+                                        <input id="input-b1" name="image" type="file" class="file">
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <label class="col-md-2 text-right"></label>
+                                    <div class="col-md-5">
+                                        <img style='height:50px; widht:50px;' name='eimage' />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -109,7 +121,9 @@
     $(document).ready(function () {
         $('.birth_date').datepicker({
             autoclose: true,
-            format: 'yyyy-mm-dd'
+            format: 'yyyy-mm-dd',
+            endDate: "today",
+            maxDate: "today"
         });
         $.ajax({
             url: "<?php echo site_url('users/getUserData/');echo $id;?>",
@@ -132,15 +146,9 @@
         first_name: {
           required: true
         },
-        last_name: {
-          required: true
-        },
         email: {
           required: true,
           email: true
-        },
-        bio: {
-          required: true
         },
         phone_no: {
           required: true,
@@ -162,9 +170,6 @@
         },
         city: {
           required: true
-        },
-        user_name: {
-          required: true
         }
       },
       submitHandler: function(form) {
@@ -172,7 +177,7 @@
       }
     });
     function submitForm(form){
-        var formData = new FormData(this);
+        var formData = new FormData(form);
         $.ajax({
             url: "<?php echo site_url('users/update/');echo $id?>",
             type: 'POST',
@@ -198,6 +203,8 @@
         $('.user_type').val(data.user_type);
         $('.city').val(data.city);
         $('.user_name').val(data.user_name);
+        base_url = "<?php echo base_url(); ?>"+data.profile_pic;
+        $("#editUser").find("[name=eimage]").attr("src",base_url);
     }
     function resetData(){
         $('.first_name').val("");

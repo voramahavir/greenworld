@@ -94,13 +94,13 @@
 
     $(".submit").click(function() {
       $.ajax({
-        url: "<?php echo site_url('LoginController/verify'); ?>",
+        url: "<?php echo site_url('LoginController/login'); ?>",
         method: 'POST',
         data: {user_name: $('[name="user_name"]').val(), password: $('[name="password"]').val()},
         dataType: "json",
         success: function(result) {
           console.log(result);
-          if (result.code) {
+          if (result.success) {
             window.location.href = "<?php echo base_url(''); ?>";
           } else {
             alert('Invalid credential');

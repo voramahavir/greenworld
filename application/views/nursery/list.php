@@ -91,7 +91,14 @@
                           <div class="row form-group">
                               <label class="col-md-3 text-right"> Longitude : </label>
                               <div class="col-md-9">
-                                  <input type="text" class="form-control longitude" name="address">
+                                  <input type="text" class="form-control longitude" name="longitude">
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-3 text-right"> Plants : </label>
+                              <div class="col-md-9">
+                                  <select class="form-control plant col-md-9" name='plant' multiple="multiple">
+                                  </select>
                               </div>
                           </div>
                           <div class="row form-group">
@@ -157,9 +164,16 @@
                               </div>
                           </div>
                           <div class="row form-group">
+                              <label class="col-md-3 text-right"> Plants : </label>
+                              <div class="col-md-9">
+                                  <select class="form-control plant col-md-9" name='plant' multiple="multiple">
+                                  </select>
+                              </div>
+                          </div>
+                          <div class="row form-group">
                               <label class="col-md-3 text-right"> Image : </label>
                               <div class="col-md-9">
-                                  <input id="input-b1" name="image" type="file" class="file" accept=".jpg, .jpeg, .png">
+                                  <input id="input-b1" name="image" type="file" class="file">
                               </div>
                           </div>
                           <div class="row form-group">
@@ -188,7 +202,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">×</span>
                 </button>
-                <h4 class="modal-title">Are you sure you want to delete the Nursery ? </h4>
+                <h4 class="modal-title">Are you sure you want to delete the Nursery ?</h4>
                 <input type="hidden" name="id" value="">
               </div>
               <div class="modal-footer">
@@ -265,8 +279,18 @@
     <script type="text/javascript">
       var table = null;
       var data = [];
+      var plants = [];
       var id=0;
+      var newplants = [];
+      var oldplants = [];
+      var selectedIndex = -1;
       $(document).ready(function(){
+        $.fn.select2.defaults.set("theme", "bootstrap");
+        $(".plant").select2({
+            closeOnSelect: false,
+            placeholder: 'Select Multiple Plants'
+        });
+        getPlants();
         table = $('#table_nursery').DataTable({
           "paging": true,
           "lengthChange": true,
@@ -364,7 +388,9 @@
       $("#recoverNurseryModal").find("[name=id]").attr("value",id);
     }
     function EditTheRow(index,aid){
+      selectedIndex = index;
       $("#editNurseryModal").modal("show");
+      $(".plant").select2("val", "");
       $("#editNurseryModal").find("[name=name]").attr("value",data[index].name);
       $("#editNurseryModal").find("[name=contact_no]").attr("value",data[index].contact_no);
       $("#editNurseryModal").find("[name=address]").attr("value",data[index].address);
@@ -373,9 +399,65 @@
       base_url = "<?php echo base_url(); ?>"+data[index].image_url;
       $("#editNurseryModal").find("[name=eimage]").attr("src",base_url);
       id = aid;
+      $.each(plants.data, function (i, item) {
+        if(item.is_active == 1){
+          $('.plant').append($('<option>', { 
+              value: item.id,
+              text : item.name 
+          }));
+        }
+      });
+      $(".select2").css("width", "100%");
+      $(".select2-search__field").css("width", "100%");
+      if(data[index].plants != null){
+        var array = JSON.parse("[" + data[index].plants + "]");
+        $('.plant').val(array).change();
+      }
+      $('.plant').on("select2:selecting", function(e) { 
+        if(data[selectedIndex].plants != null){
+          var array = JSON.parse("[" + data[selectedIndex].plants + "]");
+          var index = array.indexOf(e.params.args.data.id);
+          if(index <= -1){
+            newplants.push(e.params.args.data.id);
+          }
+          index = oldplants.indexOf(e.params.args.data.id);
+          if (index > -1) {
+              oldplants.splice(index, 1);
+          }
+        }
+      });
+      $(".plant").on("select2:select", function(evt) {
+        var element = evt.params.data.element;
+        var $element = $(element);
+        $element.detach();
+        $(this).append($element);
+        $(this).trigger("change");
+      });
+      $(".plant").on("select2:unselecting", function(e) {
+        var array = JSON.parse("[" + data[selectedIndex].plants + "]");
+        var index = array.indexOf(e.params.args.data.id);
+        if(index <= -1){
+          oldplants.push(e.params.args.data.id);
+        }
+        index = newplants.indexOf(e.params.args.data.id);
+        if (index > -1) {
+            newplants.splice(index, 1);
+        }
+      });
     }
     function AddTheRow(){
       $("#addNurseryModal").modal("show");
+      $(".plant").select2("val", "");
+      $.each(plants.data, function (i, item) {
+        if(item.is_active == 1){
+          $('.plant').append($('<option>', { 
+              value: item.id,
+              text : item.name 
+          }));
+        }
+      });
+      $(".select2").css("width", "100%");
+      $(".select2-search__field").css("width", "100%");
     }
     function BulkUpload(){
       $("#bulkNurseryModal").modal("show");
@@ -387,7 +469,7 @@
         $.post("<?php echo site_url('nursery/delete/'); ?>"+id,{})
         .done(function(result){
             result=JSON.parse(result);
-            if(result.code==1){
+            if(result.success==true){
                 table.ajax.reload();
             }
             $("#deleteNurseryModal").modal("hide");
@@ -401,7 +483,7 @@
         $.post("<?php echo site_url('nursery/recover/'); ?>"+id,{})
         .done(function(result){
             result=JSON.parse(result);
-            if(result.code==1){
+            if(result.success==true){
                 table.ajax.reload();
             }
             $("#recoverNurseryModal").modal("hide");
@@ -420,19 +502,10 @@
           maxlength: 10
         },
         latitude: {
-          required: true,
-          digits: true
+          number: true
         },
         longitude: {
-          required: true,
-          digits: true
-        },
-        address: {
-          required: true,
-          email: true
-        },
-        image: {
-          required: true
+          number: true
         }
       },
       submitHandler: function(form) {
@@ -450,20 +523,11 @@
           minlength: 10,
           maxlength: 10
         },
-        address: {
-          required: true,
-          email: true
-        },
         latitude: {
-          required: true,
-          digits: true
+          number: true
         },
         longitude: {
-          required: true,
-          digits: true
-        },
-        image: {
-          required: true
+          number: true
         }
       },
       submitHandler: function(form) {
@@ -483,7 +547,7 @@
     function submitAddForm(form) {
         var formData = new FormData(form);
         $.ajax({
-            url: "<?php echo site_url('nursery/add'); ?>",
+            url: "<?php echo site_url('nursery/add?plant='); ?>"+$('.plant').val(),
             type: 'POST',
             data: formData,
             success: function (data) {
@@ -502,7 +566,7 @@
     function submitEditForm(form) {
         var formData = new FormData(form);
         $.ajax({
-            url: "<?php echo site_url('nursery/edit/');?>"+id,
+            url: "<?php echo site_url('nursery/edit/');?>"+id+"?old="+oldplants+"&new="+newplants,
             type: 'POST',
             data: formData,
             success: function (data) {
@@ -531,6 +595,19 @@
                   $("#bulkNurseryModal").modal("hide");
                   table.ajax.reload();
               }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+    function getPlants() {
+        $.ajax({
+            url: "<?php echo site_url('plant/get'); ?>",
+            type: 'POST',
+            success: function (data) {
+              data = JSON.parse(data);
+              plants = data;
             },
             cache: false,
             contentType: false,

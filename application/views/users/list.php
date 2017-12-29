@@ -30,6 +30,7 @@
                             <th>User Name</th>
                             <th>Email</th>
                             <th>Phone No</th>
+                            <th>Image</th>
                             <th>Action</th>
                           </tr>
                         </thead>
@@ -120,7 +121,11 @@
               {
                 "data": "phone_no", 
                 "bSortable": true
-              },              
+              },
+              {
+                "data":null,
+                'bSortable': false
+              } ,             
               { 
                 "data": null,
                 "bSortable": false
@@ -128,6 +133,10 @@
           ],
           "rowCallback":function(nRow,aData,iDisplayindex){
               userid = 1;
+              base_url = "<?php echo base_url(); ?>"+aData.profile_pic;
+              $('td:eq(5)',nRow).html(""
+                  +"<img style='height:50px; widht:50px;' src='"+base_url+"'/>"
+              +"");
               if(aData.is_active==1){
                   // if(aData.user_id==userid){
                   //     $('td:eq(5)',nRow).html(""
@@ -140,7 +149,7 @@
                   //     +"");
                   // }
                   // else{
-                      $('td:eq(5)',nRow).html(""
+                      $('td:eq(6)',nRow).html(""
                           +"<button class='btn btn-info' onclick='return EditTheRow("+iDisplayindex+","+aData.user_id+");'>"
                           +"<i class='fa fa-edit'></i>"
                           +"</button>"
@@ -152,7 +161,7 @@
 
               }else{
                   $(nRow).addClass('danger');
-                  $('td:eq(5)',nRow).html(""
+                  $('td:eq(6)',nRow).html(""
                       +"<button class='btn btn-info' disabled onclick='return EditTheRow("+iDisplayindex+","+aData.user_id+");'>"
                       +"<i class='fa fa-edit'></i>"
                       +"</button>"
@@ -182,7 +191,7 @@
         $.post("<?php echo site_url('users/delete/'); ?>"+id,{})
         .done(function(result){
             result=JSON.parse(result);
-            if(result.code==1){
+            if(result.success==true){
                 table.ajax.reload();
             }
             $("#deleteUserModal").modal("hide");
@@ -196,7 +205,7 @@
         $.post("<?php echo site_url('users/recover/'); ?>"+id,{})
         .done(function(result){
             result=JSON.parse(result);
-            if(result.code==1){
+            if(result.success==true){
                 table.ajax.reload();
             }
             $("#recoverUserModal").modal("hide");

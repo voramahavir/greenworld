@@ -73,7 +73,7 @@
                               <label class="col-md-3 text-right"> Category : </label>
                               <div class="col-md-9">
                                   <select class="form-control select category_id" name='category_id'>
-                                      <option value="2">Select Category</option>
+                                      <option value="0">Select Category</option>
                                   </select>
                               </div>
                           </div>
@@ -83,16 +83,23 @@
                                   <input type="text" class="form-control description" name="description">
                               </div>
                           </div>
-                          <div class="row form-group">
+                          <div class="row form-group" style="display:none">
                               <label class="col-md-3 text-right"> QR Code : </label>
                               <div class="col-md-9">
-                                  <input type="text" class="form-control qrcode" name="qrcode">
+                                  <input type="text" class="form-control qrcode" name="qrcode" value="fd">
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-3 text-right"> Nursery : </label>
+                              <div class="col-md-9">
+                                  <select class="form-control nurserys col-md-9" name='nurserys' multiple="multiple">
+                                  </select>
                               </div>
                           </div>
                           <div class="row form-group">
                               <label class="col-md-3 text-right"> Image : </label>
                               <div class="col-md-9">
-                                  <input id="input-b1" name="image" type="file" class="file" accept=".jpg, .jpeg, .png">
+                                  <input id="input-b1" name="image" type="file" class="file">
                               </div>
                           </div>
                       </div>
@@ -131,7 +138,7 @@
                               <label class="col-md-3 text-right"> Category : </label>
                               <div class="col-md-9">
                                   <select class="form-control select category_id" name='category_id'>
-                                      <option value="2">Select Category</option>
+                                      <option value="0">Select Category</option>
                                   </select>
                               </div>
                           </div>
@@ -141,16 +148,23 @@
                                   <input type="text" class="form-control description" name="description">
                               </div>
                           </div>
-                          <div class="row form-group">
+                          <div class="row form-group" style="display:none">
                               <label class="col-md-3 text-right"> QR Code : </label>
                               <div class="col-md-9">
-                                  <input type="text" class="form-control qrcode" name="qrcode">
+                                  <input type="text" class="form-control qrcode" name="qrcode" value="fd">
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-3 text-right"> Nursery : </label>
+                              <div class="col-md-9">
+                                  <select class="form-control nurserys col-md-9" name='nurserys' multiple="multiple">
+                                  </select>
                               </div>
                           </div>
                           <div class="row form-group">
                               <label class="col-md-3 text-right"> Image : </label>
                               <div class="col-md-9">
-                                  <input id="input-b1" name="image" type="file" class="file" accept=".jpg, .jpeg, .png">
+                                  <input id="input-b1" name="image" type="file" class="file">
                               </div>
                           </div>
                           <div class="row form-group">
@@ -256,9 +270,19 @@
     <script type="text/javascript">
       var table = null;
       var data = [];
+      var nurserys = [];
       var categories =[];
+      var newnursery = [];
+      var oldnursery = [];
+      var selectedIndex = -1;
       var id=0;
       $(document).ready(function(){
+        $.fn.select2.defaults.set("theme", "bootstrap");
+        $(".nurserys").select2({
+            closeOnSelect: false,
+            placeholder: 'Select Nursery'
+        });
+        getNursery();
         $.ajax({
             url: "<?php echo site_url('plant_category/get'); ?>",
             type: 'POST',
@@ -364,7 +388,9 @@
       $("#recoverPlantModal").find("[name=id]").attr("value",id);
     }
     function EditTheRow(index,aid){
+      selectedIndex = index;
       $("#editPlantModal").modal("show");
+      $(".nurserys").select2("val", "");
       $("#editPlantModal").find("[name=name]").attr("value",data[index].name);
       $("#editPlantModal").find("[name=description]").attr("value",data[index].description);
       $("#editPlantModal").find("[name=qrcode]").attr("value",data[index].qrcode);
@@ -378,15 +404,71 @@
       $("#editPlantModal").find("[name=category_id]").html(categoryHtml);
       $("#editPlantModal").find("[name=category_id]").val(data[index].categoryid);
       id = aid;
+      $.each(nurserys.data, function (i, item) {
+        if(item.is_active == 1){
+          $('.nurserys').append($('<option>', { 
+              value: item.id,
+              text : item.name 
+          }));
+        }
+      });
+      $(".select2").css("width", "100%");
+      $(".select2-search__field").css("width", "100%");
+      if(data[index].nurserys != null){
+        var array = JSON.parse("[" + data[index].nurserys + "]");
+        $('.nurserys').val(array).change();
+      }
+      $('.nurserys').on("select2:selecting", function(e) { 
+        if(data[selectedIndex].nurserys != null){
+          var array = JSON.parse("[" + data[selectedIndex].nurserys + "]");
+          var index = array.indexOf(e.params.args.data.id);
+          if(index <= -1){
+            newnursery.push(e.params.args.data.id);
+          }
+          index = oldnursery.indexOf(e.params.args.data.id);
+          if (index > -1) {
+              oldnursery.splice(index, 1);
+          }
+        }
+      });
+      $(".nurserys").on("select2:select", function(evt) {
+        var element = evt.params.data.element;
+        var $element = $(element);
+        $element.detach();
+        $(this).append($element);
+        $(this).trigger("change");
+      });
+      $(".nurserys").on("select2:unselecting", function(e) {
+        var array = JSON.parse("[" + data[selectedIndex].nurserys + "]");
+        var index = array.indexOf(e.params.args.data.id);
+        if(index <= -1){
+          oldnursery.push(e.params.args.data.id);
+        }
+        index = newnursery.indexOf(e.params.args.data.id);
+        if (index > -1) {
+            newnursery.splice(index, 1);
+        }
+      });
     }
     function AddTheRow(){
       $("#addPlantModal").modal("show");
+      $(".nurserys").select2("val", "");
       categoryHtml = '';
       categoryHtml='<option value>Select Category</option>';
       $.each(categories,function(i,e){
           categoryHtml+='<option value="'+e.id+'">'+e.name+'</option>';
       });
       $("#addPlantModal").find("[name=category_id]").html(categoryHtml);
+      $.each(nurserys.data, function (i, item) {
+        if(item.is_active == 1){
+          $('.nurserys').append($('<option>', { 
+              value: item.id,
+              text : item.name 
+          }));
+        }
+      });
+      $(".select2").css("width", "100%");
+      $(".select2-search__field").css("width", "100%");
     }
     function BulkUpload(){
       $("#bulkPlantModal").modal("show");
@@ -398,7 +480,7 @@
         $.post("<?php echo site_url('plant/delete/'); ?>"+id,{})
         .done(function(result){
             result=JSON.parse(result);
-            if(result.code==1){
+            if(result.success==true){
                 table.ajax.reload();
             }
             $("#deletePlantModal").modal("hide");
@@ -412,7 +494,7 @@
         $.post("<?php echo site_url('plant/recover/'); ?>"+id,{})
         .done(function(result){
             result=JSON.parse(result);
-            if(result.code==1){
+            if(result.success==true){
                 table.ajax.reload();
             }
             $("#recoverPlantModal").modal("hide");
@@ -425,17 +507,6 @@
           required: true
         },
         category_id: {
-          required: true,
-          digits: true
-        },
-        description: {
-          required: true,
-          email: true
-        },
-        qrcode: {
-          required: true
-        },
-        image: {
           required: true
         }
       },
@@ -449,17 +520,6 @@
           required: true
         },
         category_id: {
-          required: true,
-          digits: true
-        },
-        description: {
-          required: true,
-          email: true
-        },
-        qrcode: {
-          required: true
-        },
-        image: {
           required: true
         }
       },
@@ -480,7 +540,7 @@
     function submitAddForm(form) {
        var formData = new FormData(form);
         $.ajax({
-            url: "<?php echo site_url('plant/add'); ?>",
+            url: "<?php echo site_url('plant/add?nurserys='); ?>"+$('.nurserys').val(),
             type: 'POST',
             data: formData,
             success: function (data) {
@@ -499,7 +559,7 @@
     function submitEditForm(form) {
       var formData = new FormData(form);
         $.ajax({
-            url: "<?php echo site_url('plant/edit/');?>"+id,
+            url: "<?php echo site_url('plant/edit/');?>"+id+"?old="+oldnursery+"&new="+newnursery,
             type: 'POST',
             data: formData,
             success: function (data) {
@@ -528,6 +588,19 @@
                   $("#bulkPlantModal").modal("hide");
                   table.ajax.reload();
               }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+    function getNursery() {
+        $.ajax({
+            url: "<?php echo site_url('nursery/get'); ?>",
+            type: 'POST',
+            success: function (data) {
+              data = JSON.parse(data);
+              nurserys = data;
             },
             cache: false,
             contentType: false,

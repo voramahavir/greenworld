@@ -9,9 +9,11 @@ class NurseryModel extends CI_Model {
         $this->load->model('ExcelModel');
 	}
 	public function add(){
+        $plants = !empty($_GET['plant']) ? explode(',', $_GET['plant']) : '';
         $data = array();
         $success = false;
         $msg = checkParams($_POST);
+        unset($_POST['plant']);
         if (empty($msg)) {
             $target_path = './assets/nursery/';
             if (!file_exists($target_path)) {
@@ -26,6 +28,14 @@ class NurseryModel extends CI_Model {
                     $_POST['image_url'] = '/assets/nursery/'. $file_name. '.'.$extension;
                     $this->db->insert("nursery",$_POST);
                     if($this->db->insert_id()){
+                        if($plants != ''){
+                            $data = array();
+                            for ($i=0; $i < count($plants); $i++) { 
+                                $arr = array('plant_id' => $plants[$i], 'nursery_id' => $this->db->insert_id());
+                                array_push($data, $arr);
+                            }
+                            $this->db->insert_batch("plant_nursery_link",$data);
+                        }
                         $success = true;
                         $msg = "Nursery added successfully.";
                     }else{
@@ -71,7 +81,7 @@ class NurseryModel extends CI_Model {
             'search' => $search
         );
         if(!empty($search)){$this->db->like("name",$search);}
-        $output['data'] = $this->db->select('id,name,contact_no,address,image_url,is_active,latitude,longitude')->get('nursery')->result();
+        $output['data'] = $this->db->query("SELECT A.id,name,contact_no,address,image_url,A.is_active,latitude,longitude,group_concat(`plant_id` separator ',') as plants from nursery as A left join plant_nursery_link as B on A.id = B.nursery_id and B.is_active = 1 GROUP BY A.id")->result();
         if(!empty($search)){$this->db->like("name",$search);}
         $output['recordsTotal']=$this->db->get('nursery')->num_rows();
         $output['recordsFiltered']=$output['recordsTotal'];
@@ -84,32 +94,43 @@ class NurseryModel extends CI_Model {
 
     public function deleteNursery($id)
     {
-        $code = 0;
-        $response = "";
-        $this->db->where('id', $id)->set(array(
+        $success = false;
+        $msg = "";
+        $count = $this->db->where('id', $id)->set(array(
             'is_active' => 0
         ))->update("nursery");
-        $code = 1;
-        $response = "Nursery deleted successfully.";
-        echo json_encode(array("code" => $code, "response" => $response));
+        if($count > 0){
+            $success = true;
+            $msg = "Nursery deleted successfully.";
+        } else{
+            $msg = "Error deleting nursery,Try again.";
+        }
+        echo json_encode(array("success" => $success, "msg" => $msg));
         exit();
     }
 
     public function recoverNursery($id)
     {
-        $code = 0;
-        $response = "";
-        $this->db->where('id', $id)->set(array(
+        $success = false;
+        $msg = "";
+        $count = $this->db->where('id', $id)->set(array(
             'is_active' => 1
         ))->update("nursery");
-        $code = 1;
-        $response = "Nursery recovered successfully.";
-        echo json_encode(array("code" => $code, "response" => $response));
+        if($count > 0){
+            $success = true;
+            $msg = "Nursery recovered successfully.";
+        } else{
+            $msg = "Error recovering nursery,Try again.";
+        }
+        echo json_encode(array("success" => $success, "msg" => $msg));
         exit();
     }
 
     public function updateNursery($id='')
     {
+        $newplants = !empty($_GET['new']) ? explode(',', $_GET['new']) : '';
+        $oldplants = !empty($_GET['old']) ? explode(',', $_GET['old']) : '';
+        unset($_POST['plant']);
         $data = array();
         $success = false;
         $msg = checkParams($_POST);
@@ -144,6 +165,23 @@ class NurseryModel extends CI_Model {
                     $msg = "Nursery updated successfully.";
                 }else{
                     $msg = "Oops! error updaing nursery.";
+                }
+            }
+            if($success){
+                if(!empty($newplants)){
+                    $data = array();
+                    for ($i=0; $i < count($newplants); $i++) { 
+                        $arr = array('plant_id' => $newplants[$i], 'nursery_id' => $id);
+                        array_push($data, $arr);
+                    }
+                    $this->db->insert_batch("plant_nursery_link",$data);
+                }
+                if(!empty($oldplants)){
+                    $data = array();
+                    for ($i=0; $i < count($oldplants); $i++) { 
+                        $where = array('plant_id' => $oldplants[$i], 'nursery_id' => $id);
+                        $this->db->where($where)->set(array('is_active' => 0))->update("plant_nursery_link");
+                    }
                 }
             }
         }
@@ -182,6 +220,20 @@ class NurseryModel extends CI_Model {
             $msg = 'File not found.';
         }
         echo json_encode(array("success" => $success,"msg" => $msg));
+        exit();
+    }
+
+    public function nearByNursery() {
+        $success = false;
+        $msg = checkParams($_POST);
+        $res = array();
+        if(empty($msg)){
+            $lat = $_POST['latitude'];
+            $long = $_POST['longitude'];
+            $res = $this->db->query("SELECT * , (3956 * 2 * ASIN(SQRT( POWER(SIN(( '".$lat."' - latitude) *  pi()/180 / 2), 2) +COS( '".$lat."' * pi()/180) * COS(latitude * pi()/180) * POWER(SIN(( '".$long."' - longitude) * pi()/180 / 2), 2) ))) as distance from nursery having  distance <= 10 order by distance")->result();
+            $success = true;
+        }
+        echo json_encode(array("success" => $success,"msg" => $msg,"data" => $res));
         exit();
     }
 }

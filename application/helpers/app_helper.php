@@ -113,12 +113,21 @@ if (!function_exists('getSessionData')) {
 
 if (!function_exists('checkParams')) {
 
-    function checkParams($post)
+    function checkParams($post,$params='')
     {
         $msg = '';
-        foreach ($post as $param_name => $param_val) {
-            if(empty($param_val)){
-                $msg .= "$param_name is missing,";
+        if($params == ''){
+            foreach ($post as $param_name => $param_val) {
+                if(empty($param_val)){
+                    $msg .= "$param_name is missing,";
+                }
+            }
+        } else {
+            $params = explode(',', $params);
+            foreach ($params as $value) {
+                if(!isset($post[$value]) || empty($post[$value])){
+                    $msg .= "$value is missing,";
+                }
             }
         }
         return $msg;

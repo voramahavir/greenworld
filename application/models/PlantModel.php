@@ -10,9 +10,11 @@ class PlantModel extends CI_Model {
 	}
 
 	public function add(){
+        $nurserys = !empty($_GET['nurserys']) ? explode(',', $_GET['nurserys']) : '';
         $data = array();
         $success = false;
         $msg = checkParams($_POST);
+        unset($_POST['nurserys']);
         if (empty($msg)) {
             $target_path = './assets/plants/'. $_POST['category_id'];
             if (!file_exists($target_path)) {
@@ -27,6 +29,14 @@ class PlantModel extends CI_Model {
                     $_POST['image_url'] = '/assets/plants/'. $_POST['category_id'] . '/'. $file_name .'.'. $extension;
                     $this->db->insert("plant",$_POST);
                     if($this->db->insert_id()){
+                        if($nurserys != ''){
+                            $data = array();
+                            for ($i=0; $i < count($nurserys); $i++) { 
+                                $arr = array('plant_id' => $this->db->insert_id(), 'nursery_id' => $nurserys[$i]);
+                                array_push($data, $arr);
+                            }
+                            $this->db->insert_batch("plant_nursery_link",$data);
+                        }
                         $success = true;
                         $msg = "Plant added successfully.";
                     }else{
@@ -43,7 +53,7 @@ class PlantModel extends CI_Model {
         exit();
 	}
 
-    public function getPlants()
+    public function getPlants($id=0)
     {
         $search = array('value' => '');
         if (isset($_POST['search'])) {
@@ -71,11 +81,15 @@ class PlantModel extends CI_Model {
             'recordsFiltered' => 0,
             'search' => $search
         );
+        if($id>0){$this->db->where('t1.category_id',$id);}
         if(!empty($search)){$this->db->like("name",$search);}
-        $this->db->select('t1.id,t1.name,description,qrcode,image_url,t2.name as category,t1.is_active,t2.id as categoryid');
+        $this->db->select("t1.id,t1.name,description,qrcode,image_url,t2.name as category,t1.is_active,t2.id as categoryid,group_concat(`nursery_id` separator ',') as nurserys");
         $this->db->join("plant_category as t2", "t2.id = t1.category_id");
+        $this->db->join("plant_nursery_link as t3","t1.id = t3.plant_id and t3.is_active = 1","left");
+        $this->db->group_by('t1.id');
         $output['data'] = $this->db->get('plant as t1')->result();
         if(!empty($search)){$this->db->like("name",$search);}
+        if($id>0){$this->db->where('category_id',$id);}
         $output['recordsTotal']=$this->db->get('plant')->num_rows();
         $output['recordsFiltered']=$output['recordsTotal'];
         if (!empty($output['data'])) {
@@ -87,32 +101,43 @@ class PlantModel extends CI_Model {
 
     public function deletePlant($id)
     {
-        $code = 0;
-        $response = "";
-        $this->db->where('id', $id)->set(array(
+        $success = false;
+        $msg = "";
+        $count = $this->db->where('id', $id)->set(array(
             'is_active' => 0
         ))->update("plant");
-        $code = 1;
-        $response = "Plant deleted successfully.";
-        echo json_encode(array("code" => $code, "response" => $response));
+        if($count > 0){
+            $success = true;
+            $msg = "Plant deleted successfully.";
+        } else{
+            $msg = "Error deleting plant,Try again.";
+        }
+        echo json_encode(array("success" => $success, "msg" => $msg));
         exit();
     }
 
     public function recoverPlant($id)
     {
-        $code = 0;
-        $response = "";
-        $this->db->where('id', $id)->set(array(
+        $success = false;
+        $msg = "";
+        $count = $this->db->where('id', $id)->set(array(
             'is_active' => 1
         ))->update("plant");
-        $code = 1;
-        $response = "Plant recovered successfully.";
-        echo json_encode(array("code" => $code, "response" => $response));
+        if($count > 0){
+            $success = true;
+            $msg = "Plant recovered successfully.";
+        } else{
+            $msg = "Error recovering plant,Try again.";
+        }
+        echo json_encode(array("success" => $success, "msg" => $msg));
         exit();
     }
 
     public function updatePlant($id='')
     {
+        $newnurserys = !empty($_GET['new']) ? explode(',', $_GET['new']) : '';
+        $oldnurserys = !empty($_GET['old']) ? explode(',', $_GET['old']) : '';
+        unset($_POST['nurserys']);
         $data = array();
         $success = false;
         $msg = checkParams($_POST);
@@ -147,6 +172,23 @@ class PlantModel extends CI_Model {
                     $msg = "Plant updated successfully.";
                 }else{
                     $msg = "Oops! error updaing plant.";
+                }
+            }
+            if($success){
+                if(!empty($newnurserys)){
+                    $data = array();
+                    for ($i=0; $i < count($newnurserys); $i++) { 
+                        $arr = array('plant_id' => $id, 'nursery_id' => $newnurserys[$i]);
+                        array_push($data, $arr);
+                    }
+                    $this->db->insert_batch("plant_nursery_link",$data);
+                }
+                if(!empty($oldnurserys)){
+                    $data = array();
+                    for ($i=0; $i < count($oldnurserys); $i++) { 
+                        $where = array('plant_id' => $id, 'nursery_id' => $oldnurserys[$i]);
+                        $this->db->where($where)->set(array('is_active' => 0))->update("plant_nursery_link");
+                    }
                 }
             }
         }

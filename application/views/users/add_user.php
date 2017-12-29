@@ -59,7 +59,7 @@
                                       </div>
                                 </div>
                                 <div class="row form-group">
-                                    <label class="col-md-2">D.O.B. :</label>
+                                    <label class="col-md-2"> D.O.B. :</label>
                                     <div class="col-md-5">
                                         <input id="birth_date" type="text" class="birth_date form-control"
                                value="<?php echo date('Y-m-d', strtotime('today', time())); ?>">
@@ -68,7 +68,7 @@
                                 <div class="row form-group">
                                       <label class="col-md-2"> Gender : </label>
                                       <div class="col-md-5">
-                                          <select class="form-control select sex" name='sex' >
+                                          <select class="form-control select sex" name='sex'>
                                               <option value="">Select</option>
                                               <option value="1">Male</option>
                                               <option value="2">Female</option>
@@ -91,6 +91,12 @@
                                           <input type="password" class="form-control password" name="password" >
                                       </div>
                                 </div>
+                                <div class="row form-group">
+                                    <label class="col-md-2"> Profile Pic : </label>
+                                    <div class="col-md-5">
+                                        <input id="input-b1" name="image" type="file" class="file">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -112,24 +118,19 @@
     $(document).ready(function () {
         $('.birth_date').datepicker({
             autoclose: true,
-            format: 'yyyy-mm-dd'
+            format: 'yyyy-mm-dd',
+            endDate: "today",
+            maxDate: "today"
         });
-
     });
     $("#addUser").validate({
       rules: {
         first_name: {
           required: true
         },
-        last_name: {
-          required: true
-        },
         email: {
           required: true,
           email: true
-        },
-        bio: {
-          required: true
         },
         phone_no: {
           required: true,
@@ -150,9 +151,6 @@
           required: true
         },
         city: {
-          required: true
-        },
-        user_name: {
           required: true
         }
       },
