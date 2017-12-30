@@ -133,7 +133,11 @@
           ],
           "rowCallback":function(nRow,aData,iDisplayindex){
               userid = 1;
-              base_url = "<?php echo base_url(); ?>"+aData.profile_pic;
+              if(aData.profile_pic) {
+                base_url = "<?php echo base_url(); ?>"+aData.profile_pic;
+              } else {
+                base_url = "<?php echo base_url('assets/no-image.jpg'); ?>";
+              }
               $('td:eq(5)',nRow).html(""
                   +"<img style='height:50px; widht:50px;' src='"+base_url+"'/>"
               +"");

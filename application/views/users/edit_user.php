@@ -110,11 +110,14 @@
                     <a href="<?php echo site_url('users/list'); ?>" class="btn btn-danger">
                         Cancel
                     </a>
-                <div class="row form-group">
-            </div>
         </div>
     </div>
     </form>
+    <div class="overlay">
+      <i class="fa fa-refresh fa-spin"></i>
+    </div>
+</div>
+</div>
 </div>
 <?php $this->load->view('include/template/common_footer'); ?>
 <script type="text/javascript">
@@ -156,9 +159,6 @@
           minlength: 10,
           maxlength: 10
         },
-        password: {
-          required: true
-        },
         sex: {
           required: true
         },
@@ -177,12 +177,14 @@
       }
     });
     function submitForm(form){
+        loadingStart();
         var formData = new FormData(form);
         $.ajax({
             url: "<?php echo site_url('users/update/');echo $id?>",
             type: 'POST',
             data: formData,
             success: function (data) {
+              loadingStop();
               data = JSON.parse(data);
               alert(data.msg);
             },

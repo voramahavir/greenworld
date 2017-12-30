@@ -47,13 +47,16 @@
                   </div>
                 </div>
             </div>
+            <div class="overlay">
+               <i class="fa fa-refresh fa-spin"></i>
+            </div>
           </div>
         </div>
       </div>
       <!-- AddModal -->
       <div class="modal fade modal-3d-flip-horizontal" id="addNurseryModal" aria-hidden="true" aria-labelledby="exampleModalTitle" role="dialog" tabindex="-1">
           <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content overlay-wrapper">
               <form id="addNursery" method="post" enctype="multipart/form-data">
                 <div class="modal-header">
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -114,7 +117,10 @@
                   <button type="button" class="btn btn-danger margin-0" data-dismiss="modal">Close</button>
                   <button type="submit" class="btn btn-default addNursery">Add</button>
                 </div>
-            </form>
+              </form>
+              <div class="overlay">
+                <i class="fa fa-refresh fa-spin"></i>
+              </div>
             </div>
           </div>
       </div>
@@ -122,7 +128,7 @@
       <!-- UpdateModal -->
       <div class="modal fade modal-3d-flip-horizontal" id="editNurseryModal" aria-hidden="true" aria-labelledby="exampleModalTitle" role="dialog" tabindex="-1">
           <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content overlay-wrapper">
               <form id="editNursery" method="post" enctype="multipart/form-data">
                 <div class="modal-header">
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -189,7 +195,10 @@
                   <button type="button" class="btn btn-danger margin-0" data-dismiss="modal">Close</button>
                   <button type="submit" class="btn btn-default editNursery">Update</button>
                 </div>
-            </form>
+              </form>
+              <div class="overlay">
+                <i class="fa fa-refresh fa-spin"></i>
+              </div>
             </div>
           </div>
       </div>
@@ -235,7 +244,7 @@
       <!-- BulkUploadModal -->
       <div class="modal fade modal-3d-flip-horizontal" id="bulkNurseryModal" aria-hidden="true" aria-labelledby="exampleModalTitle" role="dialog" tabindex="-1">
           <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content overlay-wrapper">
               <form id="addBulkNursery" method="post" enctype="multipart/form-data">
                 <div class="modal-header">
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -267,7 +276,10 @@
                   <button type="button" class="btn btn-danger margin-0" data-dismiss="modal">Close</button>
                   <button type="submit" class="btn btn-default editNursery">Upload</button>
                 </div>
-            </form>
+              </form>
+              <div class="overlay">
+                <i class="fa fa-refresh fa-spin"></i>
+              </div>
             </div>
           </div>
       </div>
@@ -339,7 +351,11 @@
               }
               data.push(aData);
               userid = 1;
-              base_url = "<?php echo base_url(); ?>"+aData.image_url;
+              if(aData.image_url) {
+                base_url = "<?php echo base_url(); ?>"+aData.image_url;
+              } else {
+                base_url = "<?php echo base_url('assets/no-image.jpg'); ?>";
+              }
               $('td:eq(5)',nRow).html(""
                   +"<img style='height:50px; widht:50px;' src='"+base_url+"'/>"
               +"");
@@ -545,12 +561,14 @@
       }
     });
     function submitAddForm(form) {
+        loadingStart();
         var formData = new FormData(form);
         $.ajax({
             url: "<?php echo site_url('nursery/add?plant='); ?>"+$('.plant').val(),
             type: 'POST',
             data: formData,
             success: function (data) {
+              loadingStop();
               data = JSON.parse(data);
               alert(data.msg);
               if(data.success == true){
@@ -564,12 +582,14 @@
         });
     }
     function submitEditForm(form) {
+        loadingStart();
         var formData = new FormData(form);
         $.ajax({
             url: "<?php echo site_url('nursery/edit/');?>"+id+"?old="+oldplants+"&new="+newplants,
             type: 'POST',
             data: formData,
             success: function (data) {
+              loadingStop();
               data = JSON.parse(data);
               alert(data.msg);
               if(data.success == true){
@@ -583,12 +603,14 @@
         });
     }
     function submitBulkForm(form) {
+        loadingStart();
         var formData = new FormData(form);
         $.ajax({
             url: "<?php echo site_url('nursery/import');?>",
             type: 'POST',
             data: formData,
             success: function (data) {
+              loadingStop();
               data = JSON.parse(data);
               alert(data.msg);
               if(data.success == true){

@@ -3,116 +3,119 @@
     <div class="col-md-12">
         <div class="box">
             <form id="addUser" method="post" enctype="multipart/form-data">
-            <div class="box-header with-border">
-                <h3 class="box-title"> Add User</h3>
-                <!-- <button type="button" id="searchItem" class="btn btn-info pull-right"><i class="fa fa-search"></i>
-                     Search Item
-                 </button>-->
-            </div>
-            <div class="box-body">
-                    <div class="col-md-11">
-                        <div class="panel panel-info">
-                            <div class="panel-header">
+                <div class="box-header with-border">
+                    <h3 class="box-title"> Add User</h3>
+                    <!-- <button type="button" id="searchItem" class="btn btn-info pull-right"><i class="fa fa-search"></i>
+                         Search Item
+                     </button>-->
+                </div>
+                <div class="box-body">
+                        <div class="col-md-11">
+                            <div class="panel panel-info">
+                                <div class="panel-header">
 
-                            </div>
-                            <div class="panel-body">
-                                <div class="row form-group">
-                                      <label class="col-md-2"> First Name : </label>
-                                      <div class="col-md-5">
-                                          <input type="text" class="form-control first_name" name="first_name" >
-                                      </div>
                                 </div>
-                                <div class="row form-group">
-                                      <label class="col-md-2"> Last Name : </label>
-                                      <div class="col-md-5">
-                                          <input type="text" class="form-control last_name" name="last_name" >
-                                      </div>
-                                </div>
-                                <div class="row form-group">
-                                      <label class="col-md-2"> User Name : </label>
-                                      <div class="col-md-5">
-                                          <input type="text" class="form-control user_name" name="user_name" >
-                                      </div>
-                                </div>
-                                <div class="row form-group">
-                                      <label class="col-md-2"> Email : </label>
-                                      <div class="col-md-5">
-                                          <input type="text" class="form-control email" name="email" >
-                                      </div>
-                                </div>
-                                <div class="row form-group">
-                                      <label class="col-md-2"> Phone No : </label>
-                                      <div class="col-md-5">
-                                          <input type="text" class="form-control phone_no" name="phone_no" >
-                                      </div>
-                                </div>
-                                <div class="row form-group">
-                                      <label class="col-md-2"> Bio : </label>
-                                      <div class="col-md-5">
-                                          <textarea type="text" class="form-control bio" name="bio" ></textarea>
-                                      </div>
-                                </div>
-                                <div class="row form-group">
-                                      <label class="col-md-2"> City : </label>
-                                      <div class="col-md-5">
-                                          <input type="text" class="form-control city" name="city" >
-                                      </div>
-                                </div>
-                                <div class="row form-group">
-                                    <label class="col-md-2"> D.O.B. :</label>
-                                    <div class="col-md-5">
-                                        <input id="birth_date" type="text" class="birth_date form-control"
-                               value="<?php echo date('Y-m-d', strtotime('today', time())); ?>">
+                                <div class="panel-body">
+                                    <div class="row form-group">
+                                          <label class="col-md-2"> First Name : </label>
+                                          <div class="col-md-5">
+                                              <input type="text" class="form-control first_name" name="first_name" >
+                                          </div>
                                     </div>
-                                </div>
-                                <div class="row form-group">
-                                      <label class="col-md-2"> Gender : </label>
-                                      <div class="col-md-5">
-                                          <select class="form-control select sex" name='sex'>
-                                              <option value="">Select</option>
-                                              <option value="1">Male</option>
-                                              <option value="2">Female</option>
-                                          </select>
-                                      </div>
-                                </div>
-                                <div class="row form-group">
-                                      <label class="col-md-2"> User Type : </label>
-                                      <div class="col-md-5">
-                                          <select class="form-control select user_type" name='user_type' >
-                                              <option value="">Select</option>
-                                              <option value="1">General</option>
-                                              <option value="2">Expert User</option>
-                                          </select>
-                                      </div>
-                                </div>
-                                <div class="row form-group">
-                                      <label class="col-md-2"> Password : </label>
-                                      <div class="col-md-5">
-                                          <input type="password" class="form-control password" name="password" >
-                                      </div>
-                                </div>
-                                <div class="row form-group">
-                                    <label class="col-md-2"> Profile Pic : </label>
-                                    <div class="col-md-5">
-                                        <input id="input-b1" name="image" type="file" class="file">
+                                    <div class="row form-group">
+                                          <label class="col-md-2"> Last Name : </label>
+                                          <div class="col-md-5">
+                                              <input type="text" class="form-control last_name" name="last_name" >
+                                          </div>
+                                    </div>
+                                    <div class="row form-group">
+                                          <label class="col-md-2"> User Name : </label>
+                                          <div class="col-md-5">
+                                              <input type="text" class="form-control user_name" name="user_name" >
+                                          </div>
+                                    </div>
+                                    <div class="row form-group">
+                                          <label class="col-md-2"> Email : </label>
+                                          <div class="col-md-5">
+                                              <input type="text" class="form-control email" name="email" >
+                                          </div>
+                                    </div>
+                                    <div class="row form-group">
+                                          <label class="col-md-2"> Phone No : </label>
+                                          <div class="col-md-5">
+                                              <input type="text" class="form-control phone_no" name="phone_no" >
+                                          </div>
+                                    </div>
+                                    <div class="row form-group">
+                                          <label class="col-md-2"> Bio : </label>
+                                          <div class="col-md-5">
+                                              <textarea type="text" class="form-control bio" name="bio" ></textarea>
+                                          </div>
+                                    </div>
+                                    <div class="row form-group">
+                                          <label class="col-md-2"> City : </label>
+                                          <div class="col-md-5">
+                                              <input type="text" class="form-control city" name="city" >
+                                          </div>
+                                    </div>
+                                    <div class="row form-group">
+                                        <label class="col-md-2"> D.O.B. :</label>
+                                        <div class="col-md-5">
+                                            <input id="birth_date" type="text" class="birth_date form-control"
+                                              value="<?php echo date('Y-m-d', strtotime('today', time())); ?>">
+                                        </div>
+                                    </div>
+                                    <div class="row form-group">
+                                          <label class="col-md-2"> Gender : </label>
+                                          <div class="col-md-5">
+                                              <select class="form-control select sex" name='sex'>
+                                                  <option value="">Select</option>
+                                                  <option value="1">Male</option>
+                                                  <option value="2">Female</option>
+                                              </select>
+                                          </div>
+                                    </div>
+                                    <div class="row form-group">
+                                          <label class="col-md-2"> User Type : </label>
+                                          <div class="col-md-5">
+                                              <select class="form-control select user_type" name='user_type' >
+                                                  <option value="">Select</option>
+                                                  <option value="1">General</option>
+                                                  <option value="2">Expert User</option>
+                                              </select>
+                                          </div>
+                                    </div>
+                                    <div class="row form-group">
+                                          <label class="col-md-2"> Password : </label>
+                                          <div class="col-md-5">
+                                              <input type="password" class="form-control password" name="password" >
+                                          </div>
+                                    </div>
+                                    <div class="row form-group">
+                                        <label class="col-md-2"> Profile Pic : </label>
+                                        <div class="col-md-5">
+                                            <input id="input-b1" name="image" type="file" class="file">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                </div>
+                <div class="box-footer">
+                    <div class="row form-group col-md-offset-5">
+                        <input type="submit" value="Save" class="btn btn-success save">
+                        <a href="<?php echo site_url('users/list'); ?>" class="btn btn-danger">
+                            Cancel
+                        </a>
                     </div>
-            </div>
-            <div class="box-footer">
-                <div class="row form-group col-md-offset-5">
-                    <input type="submit" value="Save" class="btn btn-success save">
-                    <a href="<?php echo site_url('users/list'); ?>" class="btn btn-danger">
-                        Cancel
-                    </a>
-                <div class="row form-group">
+                </div>
+            </form>
+            <div class="overlay">
+              <i class="fa fa-refresh fa-spin"></i>
             </div>
         </div>
+      </div>
     </div>
-    </form>
-</div>
 <?php $this->load->view('include/template/common_footer'); ?>
 <script type="text/javascript">
     $(document).ready(function () {
@@ -159,12 +162,14 @@
       }
     });
     function submitForm(form){
+        loadingStart();
         var formData = new FormData(form);
         $.ajax({
             url: "<?php echo site_url('users/register');?>",
             type: 'POST',
             data: formData,
             success: function (data) {
+              loadingStop();
               data = JSON.parse(data);
               alert(data.msg);
               if(data.success == true){

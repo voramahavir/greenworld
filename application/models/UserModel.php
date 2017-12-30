@@ -14,7 +14,7 @@ class UserModel extends CI_Model {
 		if (empty($msg)) {
             $user_name = $_POST['user_name'];
             $password = md5($_POST['password']);
-			$res = $this->db->query("SELECT user_id, first_name, last_name, email, user_name, phone_no FROM users WHERE (user_name = '".$user_name."' OR email = '".$user_name."' OR phone_no = '".$user_name."') AND password = '".$password."' AND is_active = 1")->result();
+			$res = $this->db->query("SELECT user_id, first_name, last_name, email, user_name, phone_no FROM users WHERE (user_name = '".$user_name."' OR email = '".$user_name."' OR phone_no = '".$user_name."') AND password = '".$password."' AND is_active = 1")->first_row();
 			if (count($res)) {
 				$output = array('success' => true, 'message' => "Login Successfully", 'data' => (object)$res);
                 if(isset($_POST['latitude']) && isset($_POST['longitude'])){
@@ -194,7 +194,7 @@ class UserModel extends CI_Model {
     public function updateUser($id='')
     {
         $success = false;
-        $msg = checkParams($_POST);
+        $msg = checkParams($_POST,'first_name,last_name,phone_no,email,birth_date');
         if(empty($msg)){
             $target_path = './assets/profilePics/';
             if (!file_exists($target_path)) {
