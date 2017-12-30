@@ -79,3 +79,6 @@ $route['articles/(:any)/(:any)'] = 'ArticlesController/$1/$2';
 $route['bills'] = 'BillsController';
 $route['bills/(:any)'] = 'BillsController/$1';
 $route['bills/(:any)/(:any)'] = 'BillsController/$1/$2';
+$route['codes'] = 'CodeController';
+$route['codes/(:any)'] = 'CodeController/$1';
+$route['codes/(:any)/(:any)'] = 'CodeController/$1/$2';

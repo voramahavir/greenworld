@@ -11,7 +11,7 @@ class BillsModel extends CI_Model {
         $data = array();
         $success = false;
         $msg = checkParams($_POST);
-        if (empty($msg)) {
+        if ($msg === '') {
             $this->db->where('user_id',$_POST['user_id']);
             $res = $this->db->get('bills')->first_row();
             if(count($res) > 0){

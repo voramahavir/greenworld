@@ -198,13 +198,16 @@ class NurseryModel extends CI_Model {
                 $finalObj = [];
                 for ($i=1; $i < count($result); $i++) { 
                     $obj = array(
-                        'name' => $result[$i][0], 
-                        'contact_no' => $result[$i][1],
-                        'address' => $result[$i][2],
-                        'latitude' => $result[$i][3],
-                        'longitude' => $result[$i][4]
+                        'name' => isset($result[$i][0]) ? $result[$i][0] : '' , 
+                        'contact_no' => isset($result[$i][1]) ? $result[$i][1] : '' ,
+                        'address' => isset($result[$i][2]) ? $result[$i][2] : '' ,
+                        'latitude' => isset($result[$i][3]) ? $result[$i][3] : '' ,
+                        'longitude' => isset($result[$i][4]) ? $result[$i][4] : '' 
                     );
-                    $finalObj[] = $obj;
+
+                    if (isset($result[$i][0]) && $result[$i][0]) {
+                        $finalObj[] = $obj;
+                    }
                 }
                 $count = $this->db->insert_batch('nursery',$finalObj);
                 if($count > 0){

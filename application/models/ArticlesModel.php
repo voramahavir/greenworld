@@ -23,8 +23,8 @@ class ArticlesModel extends CI_Model {
                 $target_path = $target_path . '/'. $file_name .'.'. $extension ;
                 if (move_uploaded_file($_FILES['image']['tmp_name'], $target_path)) {
                     $_POST['image_url'] = '/assets/articles/'. $file_name. '.'.$extension;
-                    $this->db->insert("articles",$_POST);
-                    if($this->db->insert_id()){
+                    $this->db->insert("articles", $_POST);
+                    if($this->db->insert_id()) {
                         $success = true;
                         $msg = "Article added successfully.";
                     }else{
@@ -80,7 +80,7 @@ class ArticlesModel extends CI_Model {
         }
         if(!empty($search)){$this->db->like("a.description",$search);}
         $this->db->where("a.is_active",1);
-        $this->db->select('id,description,image_url,url,type,a.is_active,a.user_id,a.created_at,CONCAT(u.first_name, " ",u.last_name) as user_fullname,u.profile_pic as user_profile_pic');
+        $this->db->select('id,description,image_url,url,title,a.is_active,a.user_id,a.created_at,CONCAT(u.first_name, " ",u.last_name) as user_fullname,u.profile_pic as user_profile_pic');
         $this->db->join('users as u','u.user_id = a.user_id');
         $output['data'] = $this->db->get('articles as a')->result();
         if(!empty($search)){$this->db->like("a.description",$search);}

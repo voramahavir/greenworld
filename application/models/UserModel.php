@@ -65,6 +65,9 @@ class UserModel extends CI_Model {
                         $success = true;
                         $msg = "User registered successfully.";
                         $data = $this->db->select('user_id,first_name,last_name,email,user_name,phone_no')->where('user_id',$id)->get("users")->first_row();
+                        $otp = rand(100000,999999);
+                        $this->send_sms($otp);
+                        $data->otp = $otp;
                     }else{
                         $msg = "Oops! error registering user.";
                     }
@@ -226,7 +229,7 @@ class UserModel extends CI_Model {
 
     public function updateLatLong($id='')
     {
-        $success = true;
+        $success = false;
         $msg = checkParams($_POST,'latitude,longitude');
         if(!empty($id) && empty($msg)){
             $this->db->where('user_id', $id);
@@ -240,5 +243,10 @@ class UserModel extends CI_Model {
         }
         echo json_encode(array("success" => $success, "msg" => $msg));
         exit();
+    }
+
+    public function send_sms($otp='')
+    {
+        return true;
     }
 }
