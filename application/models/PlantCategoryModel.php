@@ -54,7 +54,7 @@ class PlantCategoryModel extends CI_Model {
             'search' => $search
         );
         if(!empty($search)){$this->db->like("name",$search);}
-        $output['data'] = $this->db->select('id,name,is_active')->get('plant_category')->result();
+        $output['data'] = $this->db->select('id,name,is_active')->where('is_active',1)->get('plant_category')->result();
         if(!empty($search)){$this->db->like("name",$search);}
         $output['recordsTotal']=$this->db->get('plant_category')->num_rows();
         $output['recordsFiltered']=$output['recordsTotal'];

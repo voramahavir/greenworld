@@ -17,7 +17,7 @@ class UserModel extends CI_Model {
 			$res = $this->db->query("SELECT user_id, first_name, last_name, email, user_name, phone_no, is_verified FROM users WHERE (user_name = '".$user_name."' OR email = '".$user_name."' OR phone_no = '".$user_name."') AND password = '".$password."' AND is_active = 1")->first_row();
 			if (count($res)) {
                 $otp = rand(100000,999999);
-                $this->send_sms($otp);
+                $this->send_sms($otp, $res->phone_no);
                 $res->otp = $otp;
 				$output = array('success' => true, 'message' => "Login Successfully", 'data' => (object)$res);
                 if(isset($_POST['latitude']) && isset($_POST['longitude'])){
@@ -37,7 +37,7 @@ class UserModel extends CI_Model {
 	public function register(){
         $data = array();
         $success = false;
-        $msg = checkParams($_POST,'first_name,last_name,phone_no,email,password,birth_date');
+        $msg = checkParams($_POST,'first_name,phone_no,email,password');
         if (empty($msg)) {
             $q = $this->db->or_where(array(
                 'email' => $_POST['email'],'phone_no' => $_POST['phone_no']
@@ -69,7 +69,7 @@ class UserModel extends CI_Model {
                         $msg = "User registered successfully.";
                         $data = $this->db->select('user_id,first_name,last_name,email,user_name,phone_no')->where('user_id',$id)->get("users")->first_row();
                         $otp = rand(100000,999999);
-                        $this->send_sms($otp);
+                        $this->send_sms($otp, $data->phone_no);
                         $data->otp = $otp;
                     } else{
                         $msg = "Oops! error registering user.";
@@ -184,7 +184,7 @@ class UserModel extends CI_Model {
     {
         $success = false;
         $this->db->where('user_id', $id);
-        $response = $this->db->select('user_id,first_name,last_name,email,user_name,phone_no,bio,sex,user_type,birth_date,profile_pic')->get('users')->first_row();
+        $response = $this->db->select('user_id,first_name,last_name,email,user_name,phone_no,bio,sex,user_type,birth_date,profile_pic,city')->get('users')->first_row();
         if($response != null){
             $success = true;
             $msg = 'Data fetched successfully';
@@ -214,6 +214,10 @@ class UserModel extends CI_Model {
                 } else {
                     $msg = "Error in uploading file, Try again.";
                 }
+            }
+            $count = 0;
+            if($_POST['password'] === ''){
+                unset($_POST['password']);
             }
             $this->db->where('user_id', $id);
             $count = $this->db->update("users",$_POST);
@@ -263,61 +267,46 @@ class UserModel extends CI_Model {
         exit();
     }
 
-    public function send_sms($otp='')
+    public function send_sms($otp='', $mobileNumber)
     {        
         //Your authentication key
-            $authKey = "190629AOn1V8cU4Y55a47ef98";
+        $authKey = "190629AOn1V8cU4Y55a47ef98";
+        
+        //Sender ID,While using route4 sender id should be 6 characters long.
+        $senderId = "REGREE";
+        
+        //Your message to send, Add URL encoding here.
+        $message = urlencode($otp . " otp to verify your number.");
             
-            //Multiple mobiles numbers separated by comma
-            $mobileNumber = "7405364613";
-            
-            //Sender ID,While using route4 sender id should be 6 characters long.
-            $senderId = "102234";
-            
-            //Your message to send, Add URL encoding here.
-            $message = urlencode("Verification code is ". $otp);
-            
-            //Define route 
-            $route = "default";
-            //Prepare you post parameters
-            $postData = array(
-                'authkey' => $authKey,
-                'mobiles' => $mobileNumber,
-                'message' => $message,
-                'sender' => $senderId,
-                'route' => $route
-            );
-            
-            //API URL
-            $url="https://control.msg91.com/api/sendhttp.php";
-            
-            // init the resource
-            $ch = curl_init();
-            curl_setopt_array($ch, array(
-                CURLOPT_URL => $url,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_POST => true,
-                CURLOPT_POSTFIELDS => $postData
-                //,CURLOPT_FOLLOWLOCATION => true
-            ));
-            
+        $curl = curl_init();
+        
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => "http://api.msg91.com/api/v2/sendsms",
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => "",
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 30,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => "POST",
+          CURLOPT_POSTFIELDS => "{ \"sender\": \"REGREN\", \"route\": \"4\", \"country\": \"91\", \"sms\": [ { \"message\": \"$message\", \"to\": [ \"$mobileNumber\" ] } ] }",
+          CURLOPT_SSL_VERIFYHOST => 0,
+          CURLOPT_SSL_VERIFYPEER => 0,
+          CURLOPT_HTTPHEADER => array(
+            "authkey: " . $authKey,
+            "content-type: application/json"
+          ),
+        ));
+        
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        
+        curl_close($curl);
 
-            //Ignore SSL certificate verification
-            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-
-            
-            //get response
-            $output = curl_exec($ch);
-            
-            //Print error if any
-            if(curl_errno($ch))
-            {
-                return false;
-               // echo 'error:' . curl_error($ch);
-            }
-            
-            curl_close($ch);
+        if ($err) {
+          return "cURL Error #:" . $err;
+        } else {
+          return $response;
+        }
             
         return true;
     }

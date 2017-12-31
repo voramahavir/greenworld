@@ -13,7 +13,7 @@ class PlantModel extends CI_Model {
         $nurserys = !empty($_GET['nurserys']) ? explode(',', $_GET['nurserys']) : '';
         $data = array();
         $success = false;
-        $msg = checkParams($_POST,'name,category_id');
+        $msg = checkParams($_POST,'local_name,category_id');
         unset($_POST['nurserys']);
         if (empty($msg)) {
             $target_path = './assets/plants/'. $_POST['category_id'];
@@ -83,13 +83,13 @@ class PlantModel extends CI_Model {
             'search' => $search
         );
         if($id>0){$this->db->where('t1.category_id',$id);}
-        if(!empty($search)){$this->db->like("name",$search);}
-        $this->db->select("t1.id,t1.name,description,qrcode,image_url,t2.name as category,t1.is_active,t2.id as categoryid,group_concat(`nursery_id` separator ',') as nurserys");
+        if(!empty($search)){$this->db->like("local_name",$search);}
+        $this->db->select("t1.id,local_name,english_name,botanical_name,habit,family,watering,location,plant_use,extra_comment,image_url,t2.name as category,t1.is_active,t2.id as categoryid,group_concat(`nursery_id` separator ',') as nurserys");
         $this->db->join("plant_category as t2", "t2.id = t1.category_id");
         $this->db->join("plant_nursery_link as t3","t1.id = t3.plant_id and t3.is_active = 1","left");
         $this->db->group_by('t1.id');
         $output['data'] = $this->db->get('plant as t1')->result();
-        if(!empty($search)){$this->db->like("name",$search);}
+        if(!empty($search)){$this->db->like("local_name",$search);}
         if($id>0){$this->db->where('category_id',$id);}
         $output['recordsTotal']=$this->db->get('plant')->num_rows();
         $output['recordsFiltered']=$output['recordsTotal'];
@@ -141,7 +141,7 @@ class PlantModel extends CI_Model {
         unset($_POST['nurserys']);
         $data = array();
         $success = false;
-        $msg = checkParams($_POST,'name,category_id');
+        $msg = checkParams($_POST,'local_name,category_id');
         if (empty($msg)) {
             $target_path = './assets/plants/'. $_POST['category_id'];
             if (!file_exists($target_path)) {
@@ -237,11 +237,29 @@ class PlantModel extends CI_Model {
             if(count($result) > 1){
                 $finalObj = [];
                 for ($i=1; $i < count($result); $i++) { 
+                    $category_id = 0;
+                    if(isset($result[$i][9])){
+                        $res = $this->db->select('id')->where('name',$result[$i][9])->get('plant_category')->result();
+                        if(count($res) > 0){
+                            $category_id = $res[0]->id;
+                        } else {
+                            $this->db->insert('plant_category',array('name' => $result[$i][9]));
+                            if($this->db->insert_id()){
+                                $category_id = $this->db->insert_id();
+                            }
+                        }
+                    }
                     $obj = array(
-                        'name' => $result[$i][0], 
-                        'qrcode' => $result[$i][1],
-                        'description' => $result[$i][2],
-                        'category_id' => 1
+                        'local_name' => isset($result[$i][0]) ? $result[$i][0] : '', 
+                        'english_name' => isset($result[$i][1]) ? $result[$i][1] : '',
+                        'botanical_name' => isset($result[$i][2]) ? $result[$i][2] : '',
+                        'habit' => isset($result[$i][3]) ? $result[$i][3] : '',
+                        'family' => isset($result[$i][4]) ? $result[$i][4] : '', 
+                        'watering' => isset($result[$i][5]) ? $result[$i][5] : '',
+                        'location' => isset($result[$i][6]) ? $result[$i][6] : '',
+                        'plant_use' => isset($result[$i][7]) ? $result[$i][7] : '',
+                        'extra_comment' => isset($result[$i][8]) ? $result[$i][8] : '', 
+                        'category_id' => $category_id
                     );
                     $finalObj[] = $obj;
                 }

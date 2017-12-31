@@ -31,10 +31,16 @@
                       <table class="table table-bordered table-hover dataTable" id="table_plant">
                         <thead>
                           <tr>
-                            <th>Name</th>
+                            <th>Local Name</th>
+                            <th>English Name</th>
+                            <th>Botanical Name</th>
+                            <th>Habit</th>
+                            <th>Family</th>
+                            <th>Watering</th>
+                            <th>Location</th>
+                            <th>Use</th>
+                            <th>Extra Comment</th>
                             <th>Category</th>
-                            <th>Description</th>
-                            <th>Image</th>
                             <th>Action</th>
                           </tr>
                         </thead>
@@ -66,41 +72,87 @@
                     <div class="row">
                       <div class="col-md-9">
                           <div class="row form-group">
-                              <label class="col-md-3 text-right"> Name : </label>
-                              <div class="col-md-9">
-                                  <input type="text" class="form-control name" name="name">
+                              <label class="col-md-4 text-right"> Local Name : </label>
+                              <div class="col-md-8">
+                                  <input type="text" class="form-control local_name" name="local_name">
                               </div>
                           </div>
                           <div class="row form-group">
-                              <label class="col-md-3 text-right"> Category : </label>
-                              <div class="col-md-9">
+                              <label class="col-md-4 text-right"> Category : </label>
+                              <div class="col-md-8">
                                   <select class="form-control select category_id" name='category_id'>
                                       <option value="0">Select Category</option>
                                   </select>
                               </div>
                           </div>
                           <div class="row form-group">
-                              <label class="col-md-3 text-right"> Description  : </label>
-                              <div class="col-md-9">
-                                  <input type="text" class="form-control description" name="description">
-                              </div>
-                          </div>
-                          <div class="row form-group" style="display:none">
-                              <label class="col-md-3 text-right"> QR Code : </label>
-                              <div class="col-md-9">
-                                  <input type="text" class="form-control qrcode" name="qrcode" value="">
+                              <label class="col-md-4 text-right"> English Name  : </label>
+                              <div class="col-md-8">
+                                  <input type="text" class="form-control english_name" name="english_name">
                               </div>
                           </div>
                           <div class="row form-group">
-                              <label class="col-md-3 text-right"> Nursery : </label>
-                              <div class="col-md-9">
-                                  <select class="form-control nurserys col-md-9" name='nurserys' multiple="multiple">
+                              <label class="col-md-4 text-right"> Botanical Name : </label>
+                              <div class="col-md-8">
+                                  <input type="text" class="form-control botanical_name" name="botanical_name">
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-4 text-right"> Habit : </label>
+                              <div class="col-md-8">
+                                  <input type="text" class="form-control habit" name="habit">
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-4 text-right"> Family : </label>
+                              <div class="col-md-8">
+                                  <input type="text" class="form-control family" name="family">
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-4 text-right"> Watering : </label>
+                              <div class="col-md-8">
+                                  <select class="form-control select watering" name='watering'>
+                                      <option value="">Select Watering Type</option>
+                                      <option value="High">High</option>
+                                      <option value="Modrate">Modrate</option>
+                                      <option value="Less">Less</option>
+                                  </select>
+                              </div>
+                          </div>
+                           <div class="row form-group">
+                              <label class="col-md-4 text-right"> Location : </label>
+                              <div class="col-md-8">
+                                  <select class="form-control select location" name='location'>
+                                      <option value="">Select Location</option>
+                                      <option value="Outdoor">Outdoor</option>
+                                      <option value="Indoor">Indoor</option>
+                                      <option value="Indoor as well as outdoor">Indoor as well as outdoor</option>
                                   </select>
                               </div>
                           </div>
                           <div class="row form-group">
-                              <label class="col-md-3 text-right"> Image : </label>
-                              <div class="col-md-9">
+                              <label class="col-md-4 text-right"> Use : </label>
+                              <div class="col-md-8">
+                                  <input type="text" class="form-control plant_use" name="plant_use">
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-4 text-right"> Extra Comment : </label>
+                              <div class="col-md-8">
+                                  <input type="text" class="form-control extra_comment" name="extra_comment">
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-4 text-right"> Nursery : </label>
+                              <div class="col-md-8">
+                                  <select class="form-control nurserys col-md-8" name='nurserys' multiple="multiple">
+                                  </select>
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-4 text-right"> Image : </label>
+                              <div class="col-md-8">
                                   <input id="input-b1" name="image" type="file" class="file">
                               </div>
                           </div>
@@ -134,47 +186,93 @@
                     <div class="row">
                       <div class="col-md-9">
                           <div class="row form-group">
-                              <label class="col-md-3 text-right"> Name : </label>
-                              <div class="col-md-9">
-                                  <input type="text" class="form-control name" name="name">
+                              <label class="col-md-4 text-right"> Local Name : </label>
+                              <div class="col-md-8">
+                                  <input type="text" class="form-control local_name" name="local_name">
                               </div>
                           </div>
                           <div class="row form-group">
-                              <label class="col-md-3 text-right"> Category : </label>
-                              <div class="col-md-9">
+                              <label class="col-md-4 text-right"> Category : </label>
+                              <div class="col-md-8">
                                   <select class="form-control select category_id" name='category_id'>
                                       <option value="0">Select Category</option>
                                   </select>
                               </div>
                           </div>
                           <div class="row form-group">
-                              <label class="col-md-3 text-right"> Description  : </label>
-                              <div class="col-md-9">
-                                  <input type="text" class="form-control description" name="description">
-                              </div>
-                          </div>
-                          <div class="row form-group" style="display:none">
-                              <label class="col-md-3 text-right"> QR Code : </label>
-                              <div class="col-md-9">
-                                  <input type="text" class="form-control qrcode" name="qrcode" value="">
+                              <label class="col-md-4 text-right"> English Name  : </label>
+                              <div class="col-md-8">
+                                  <input type="text" class="form-control english_name" name="english_name">
                               </div>
                           </div>
                           <div class="row form-group">
-                              <label class="col-md-3 text-right"> Nursery : </label>
-                              <div class="col-md-9">
-                                  <select class="form-control nurserys col-md-9" name='nurserys' multiple="multiple">
+                              <label class="col-md-4 text-right"> Botanical Name : </label>
+                              <div class="col-md-8">
+                                  <input type="text" class="form-control botanical_name" name="botanical_name">
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-4 text-right"> Habit : </label>
+                              <div class="col-md-8">
+                                  <input type="text" class="form-control habit" name="habit">
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-4 text-right"> Family : </label>
+                              <div class="col-md-8">
+                                  <input type="text" class="form-control family" name="family">
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-4 text-right"> Watering : </label>
+                              <div class="col-md-8">
+                                  <select class="form-control select watering" name='watering'>
+                                      <option value="">Select Watering Type</option>
+                                      <option value="High">High</option>
+                                      <option value="Modrate">Modrate</option>
+                                      <option value="Less">Less</option>
+                                  </select>
+                              </div>
+                          </div>
+                           <div class="row form-group">
+                              <label class="col-md-4 text-right"> Location : </label>
+                              <div class="col-md-8">
+                                  <select class="form-control select location" name='location'>
+                                      <option value="">Select Location</option>
+                                      <option value="Outdoor">Outdoor</option>
+                                      <option value="Indoor">Indoor</option>
+                                      <option value="Indoor as well as outdoor">Indoor as well as outdoor</option>
                                   </select>
                               </div>
                           </div>
                           <div class="row form-group">
-                              <label class="col-md-3 text-right"> Image : </label>
-                              <div class="col-md-9">
+                              <label class="col-md-4 text-right"> Use : </label>
+                              <div class="col-md-8">
+                                  <input type="text" class="form-control plant_use" name="plant_use">
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-4 text-right"> Extra Comment : </label>
+                              <div class="col-md-8">
+                                  <input type="text" class="form-control extra_comment" name="extra_comment">
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-4 text-right"> Nursery : </label>
+                              <div class="col-md-8">
+                                  <select class="form-control nurserys col-md-8" name='nurserys' multiple="multiple">
+                                  </select>
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-4 text-right"> Image : </label>
+                              <div class="col-md-8">
                                   <input id="input-b1" name="image" type="file" class="file">
                               </div>
                           </div>
                           <div class="row form-group">
-                              <label class="col-md-3 text-right"></label>
-                              <div class="col-md-9">
+                              <label class="col-md-4 text-right"></label>
+                              <div class="col-md-8">
                                   <img style='height:50px; widht:50px;' name='eimage' />
                               </div>
                           </div>
@@ -288,6 +386,7 @@
       var selectedIndex = -1;
       var id=0;
       $(document).ready(function(){
+        $('body').addClass('sidebar-collapse');
         $.fn.select2.defaults.set("theme", "bootstrap");
         $(".nurserys").select2({
             closeOnSelect: false,
@@ -320,15 +419,43 @@
           },
           "columns": [
               { 
-                "data": "name", 
+                "data": "local_name", 
                 "bSortable": true
               },
               { 
-                "data": "category", 
+                "data": "english_name", 
+                "bSortable": true
+              },
+              { 
+                "data": "botanical_name", 
+                "bSortable": true
+              },
+              { 
+                "data": "habit", 
+                "bSortable": true
+              },
+              { 
+                "data": "family", 
+                "bSortable": true
+              },
+              { 
+                "data": "watering", 
+                "bSortable": true
+              },
+              { 
+                "data": "location", 
+                "bSortable": true
+              },
+              { 
+                "data": "plant_use", 
+                "bSortable": true
+              },
+              { 
+                "data": "extra_comment", 
                 "bSortable": true
               },
               {
-                "data": "description", 
+                "data": "category", 
                 "bSortable": false
               },
               {
@@ -351,7 +478,7 @@
               } else {
                 base_url = "<?php echo base_url('assets/no-image.jpg'); ?>";
               }
-              $('td:eq(3)',nRow).html(""
+              $('td:eq(10)',nRow).html(""
                   +"<img style='height:50px; widht:50px;' src='"+base_url+"'/>"
               +"");
               if(aData.is_active==1){
@@ -366,7 +493,7 @@
                   //     +"");
                   // }
                   // else{
-                      $('td:eq(4)',nRow).html(""
+                      $('td:eq(11)',nRow).html(""
                           +"<button class='btn btn-info' onclick='return EditTheRow("+iDisplayindex+","+aData.id+");'>"
                           +"<i class='fa fa-edit'></i>"
                           +"</button>"
@@ -378,7 +505,7 @@
 
               }else{
                   $(nRow).addClass('danger');
-                  $('td:eq(4)',nRow).html(""
+                  $('td:eq(11)',nRow).html(""
                       +"<button class='btn btn-info' disabled onclick='return EditTheRow("+iDisplayindex+","+aData.id+");'>"
                       +"<i class='fa fa-edit'></i>"
                       +"</button>"
@@ -402,10 +529,20 @@
       selectedIndex = index;
       $("#editPlantModal").modal("show");
       $(".nurserys").select2("val", "");
-      $("#editPlantModal").find("[name=name]").attr("value",data[index].name);
-      $("#editPlantModal").find("[name=description]").attr("value",data[index].description);
-      $("#editPlantModal").find("[name=qrcode]").attr("value",data[index].qrcode);
-      base_url = "<?php echo base_url(); ?>"+data[index].image_url;
+      $("#editPlantModal").find("[name=local_name]").attr("value",data[index].local_name);
+      $("#editPlantModal").find("[name=english_name]").attr("value",data[index].english_name);
+      $("#editPlantModal").find("[name=botanical_name]").attr("value",data[index].botanical_name);
+      $("#editPlantModal").find("[name=habit]").attr("value",data[index].habit);
+      $("#editPlantModal").find("[name=family]").attr("value",data[index].family);
+      $("#editPlantModal").find("[name=plant_use]").attr("value",data[index].plant_use);
+      $("#editPlantModal").find("[name=extra_comment]").attr("value",data[index].extra_comment);
+      $("#editPlantModal").find("[name=watering]").val(data[index].watering);
+      $("#editPlantModal").find("[name=location]").val(data[index].location);
+      if(data[index].image_url) {
+        base_url = "<?php echo base_url(); ?>"+data[index].image_url;
+      } else {
+        base_url = "<?php echo base_url('assets/no-image.jpg'); ?>";
+      }
       $("#editPlantModal").find("[name=eimage]").attr("src",base_url);
       categoryHtml = '';
       categoryHtml='<option value>Select Category</option>';
@@ -440,7 +577,11 @@
           if (index > -1) {
               oldnursery.splice(index, 1);
           }
+        } else {
+          newnursery.push(e.params.args.data.id);
         }
+        console.log('selecting',oldnursery);
+        console.log('selecting',newnursery);
       });
       $(".nurserys").on("select2:select", function(evt) {
         var element = evt.params.data.element;
@@ -448,10 +589,13 @@
         $element.detach();
         $(this).append($element);
         $(this).trigger("change");
+        console.log('select',oldnursery);
+        console.log('select',newnursery);
       });
       $(".nurserys").on("select2:unselecting", function(e) {
         var array = JSON.parse("[" + data[selectedIndex].nurserys + "]");
         var index = array.indexOf(e.params.args.data.id);
+        console.log(index);
         if(index <= -1){
           oldnursery.push(e.params.args.data.id);
         }
@@ -459,6 +603,8 @@
         if (index > -1) {
             newnursery.splice(index, 1);
         }
+        console.log('unselecting',oldnursery);
+        console.log('unselecting',newnursery);
       });
     }
     function AddTheRow(){
@@ -515,7 +661,7 @@
     });
     $("#addPlant").validate({
       rules: {
-        name: {
+        local_name: {
           required: true
         },
         category_id: {

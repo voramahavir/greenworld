@@ -25,6 +25,7 @@
                             <th>Image</th>
                             <th>Amount</th>
                             <th>Status</th>
+                            <th>Action</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -45,17 +46,49 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">×</span>
                 </button>
-                <h4 class="modal-title">Do you want to confirm or cancel ?</h4>
+                <h4 class="modal-title">Are you sure you want to do this ?</h4>
                 <input type="hidden" name="id" value="">
+                <input type="hidden" name="status" value="">
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-danger margin-0" onclick="ajaxCall(1)">Cancel</button>
-                <button type="button" class="btn btn-success" onclick="ajaxCall(2)">Confirm</button>
+                <button type="button" class="btn btn-danger margin-0">No</button>
+                <button type="button" class="btn btn-success" onclick="ajaxCall()">Yes</button>
               </div>
             </div>
           </div>
       </div>
       <!-- End RecoverModal -->
+      <!-- UpdateModal -->
+      <div class="modal fade modal-3d-flip-horizontal" id="fullImageModal" aria-hidden="true" aria-labelledby="exampleModalTitle" role="dialog" tabindex="-1">
+          <div class="modal-dialog">
+            <div class="modal-content overlay-wrapper">
+              <form id="editNursery" method="post" enctype="multipart/form-data">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row" style='margin-right: 0px !important; margin-left: 20px !important;'>
+                      <div class="col-md-9">
+                          <div class="row form-group">
+                              <div class="col-md-12">
+                                  <img style='height:500px; widht:500px;' name='image' />
+                              </div>
+                          </div>
+                      </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                </div>
+              </form>
+              <div class="overlay">
+                <i class="fa fa-refresh fa-spin"></i>
+              </div>
+            </div>
+          </div>
+      </div>
+      <!-- End UpdateModal -->
 <?php $this->load->view('include/template/common_footer'); ?>
 <!-- Bootstrap-notify -->
 <script src="<?php echo base_url('assets/theme/bower_components/datatables.net/js/jquery.dataTables.js'); ?>"></script>
@@ -93,6 +126,10 @@
               {
                 "data": null, 
                 "bSortable": false
+              },
+              {
+                "data": null, 
+                "bSortable": false
               }
           ],
           "rowCallback":function(nRow,aData,iDisplayindex){
@@ -101,31 +138,66 @@
               }
               data.push(aData);
               userid = 1;
-              base_url = "<?php echo base_url(); ?>"+aData.image_url;
+              if(aData.image_url) {
+                base_url = "<?php echo base_url(); ?>"+aData.image_url;
+              } else {
+                base_url = "<?php echo base_url('assets/no-image.jpg'); ?>";
+              }
               $('td:eq(1)',nRow).html(""
-                  +"<img style='height:50px; widht:50px;' src='"+base_url+"'/>"
+                  +"<img style='height:50px; widht:50px;' src='"+base_url+"' onclick='return fullImage("+iDisplayindex+","+aData.id+");'>"
               +"");
               if(aData.is_confirm==1){
                   $('td:eq(3)',nRow).html("Cancelled");
+                  $('td:eq(4)',nRow).html(""
+                      +"<button class='btn btn-success' onclick='return ConfirmBill("+iDisplayindex+","+aData.id+",2);'>"
+                      +"<i class='fa fa-check'></i>"
+                      +"</button>"
+                      +"<button class='btn btn-danger' disabled onclick='return ConfirmBill("+iDisplayindex+","+aData.id+",1);'>"
+                      +"<i class='fa fa-close'></i>"
+                      +"</button>"
+                  +"");
               } else if (aData.is_confirm==2){
                   $('td:eq(3)',nRow).html("Confirmed");
-              }else{
-                  $('td:eq(3)',nRow).html(""
-                      +"<button class='btn btn-success' onclick='return ConfirmBill("+iDisplayindex+","+aData.id+");'>"
+                  $('td:eq(4)',nRow).html(""
+                      +"<button class='btn btn-success' disabled onclick='return ConfirmBill("+iDisplayindex+","+aData.id+",2);'>"
                       +"<i class='fa fa-check'></i>"
+                      +"</button>"
+                      +"<button class='btn btn-danger' onclick='return ConfirmBill("+iDisplayindex+","+aData.id+",1);'>"
+                      +"<i class='fa fa-close'></i>"
+                      +"</button>"
+                  +"");
+              }else{
+                  $('td:eq(3)',nRow).html("Pending");
+                  $('td:eq(4)',nRow).html(""
+                      +"<button class='btn btn-success' onclick='return ConfirmBill("+iDisplayindex+","+aData.id+",2);'>"
+                      +"<i class='fa fa-check'></i>"
+                      +"</button>"
+                      +"<button class='btn btn-danger' onclick='return ConfirmBill("+iDisplayindex+","+aData.id+",1);'>"
+                      +"<i class='fa fa-close'></i>"
                       +"</button>"
                   +"");
               }
           },
         });
     });
-    function ConfirmBill(index,id){
+    function ConfirmBill(index,id,status){
       $("#confirmModal").modal("show");
       $("#confirmModal").find("[name=id]").attr("value",id);
+      $("#confirmModal").find("[name=status]").attr("value",status);
     }
-    function ajaxCall(value=0) {
+    function fullImage(index,id) {
+      if(data[index].image_url) {
+        base_url = "<?php echo base_url(); ?>"+data[index].image_url;
+      } else {
+        base_url = "<?php echo base_url('assets/no-image.jpg'); ?>";
+      }
+      $("#fullImageModal").modal("show");
+      $("#fullImageModal").find("[name=image]").attr("src",base_url);
+    }
+    function ajaxCall() {
       var id=-1;
       id=$("#confirmModal").find("[name=id]").val();
+      value=$("#confirmModal").find("[name=status]").val();
       $.post("<?php echo site_url('bills/confirm/'); ?>"+id,{
           is_confirm : value
       })

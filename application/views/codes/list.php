@@ -70,7 +70,7 @@
                                   <select class="form-control select type" name='type'>
                                       <option value="0">Select Type</option>
                                       <option value="1">Amount</option>
-                                      <option value="2">Discount</option>
+                                      <option value="2">Percentage</option>
                                   </select>
                               </div>
                           </div>
@@ -118,7 +118,7 @@
                                   <select class="form-control select type" name='type'>
                                       <option value="0">Select Type</option>
                                       <option value="1">Amount</option>
-                                      <option value="2">Discount</option>
+                                      <option value="2">Percentage</option>
                                   </select>
                               </div>
                           </div>
