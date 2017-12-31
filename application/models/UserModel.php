@@ -14,8 +14,11 @@ class UserModel extends CI_Model {
 		if (empty($msg)) {
             $user_name = $_POST['user_name'];
             $password = md5($_POST['password']);
-			$res = $this->db->query("SELECT user_id, first_name, last_name, email, user_name, phone_no FROM users WHERE (user_name = '".$user_name."' OR email = '".$user_name."' OR phone_no = '".$user_name."') AND password = '".$password."' AND is_active = 1")->first_row();
+			$res = $this->db->query("SELECT user_id, first_name, last_name, email, user_name, phone_no, is_verified FROM users WHERE (user_name = '".$user_name."' OR email = '".$user_name."' OR phone_no = '".$user_name."') AND password = '".$password."' AND is_active = 1")->first_row();
 			if (count($res)) {
+                $otp = rand(100000,999999);
+                $this->send_sms($otp);
+                $res->otp = $otp;
 				$output = array('success' => true, 'message' => "Login Successfully", 'data' => (object)$res);
                 if(isset($_POST['latitude']) && isset($_POST['longitude'])){
                     $this->db->where('user_id', $res->user_id);
@@ -42,7 +45,7 @@ class UserModel extends CI_Model {
             $num_rows = $q->num_rows();
             if($num_rows>0){
                 $msg = "User already exist.";
-            }else{
+            } else {
                 $target_path = './assets/profilePics/';
                 if (!file_exists($target_path)) {
                     mkdir($target_path, 0777, true);
@@ -68,7 +71,7 @@ class UserModel extends CI_Model {
                         $otp = rand(100000,999999);
                         $this->send_sms($otp);
                         $data->otp = $otp;
-                    }else{
+                    } else{
                         $msg = "Oops! error registering user.";
                     }
                 }
@@ -149,9 +152,7 @@ class UserModel extends CI_Model {
     {
         $success = false;
         $msg = "";
-        $count = $this->db->where('user_id', $id)->set(array(
-            'is_active' => 0
-        ))->update("users");
+        $count = $this->db->where('user_id', $id)->delete("users");
         if($count > 0){
             $success = true;
             $msg = "User deleted successfully.";
@@ -245,8 +246,79 @@ class UserModel extends CI_Model {
         exit();
     }
 
-    public function send_sms($otp='')
+    public function verifyUser($id='')
     {
+        $success = false;
+        if(!empty($id)) {
+            $this->db->where('user_id', $id);
+            $count = $this->db->update("users", array('is_verified' => 1));
+            if($count > 0){
+                $success = true;
+                $msg = 'User verified successfully';
+            }else{
+                $msg = 'Error verifing user, Try again.';
+            }
+        }
+        echo json_encode(array("success" => $success, "msg" => $msg));
+        exit();
+    }
+
+    public function send_sms($otp='')
+    {        
+        //Your authentication key
+            $authKey = "190629AOn1V8cU4Y55a47ef98";
+            
+            //Multiple mobiles numbers separated by comma
+            $mobileNumber = "7405364613";
+            
+            //Sender ID,While using route4 sender id should be 6 characters long.
+            $senderId = "102234";
+            
+            //Your message to send, Add URL encoding here.
+            $message = urlencode("Verification code is ". $otp);
+            
+            //Define route 
+            $route = "default";
+            //Prepare you post parameters
+            $postData = array(
+                'authkey' => $authKey,
+                'mobiles' => $mobileNumber,
+                'message' => $message,
+                'sender' => $senderId,
+                'route' => $route
+            );
+            
+            //API URL
+            $url="https://control.msg91.com/api/sendhttp.php";
+            
+            // init the resource
+            $ch = curl_init();
+            curl_setopt_array($ch, array(
+                CURLOPT_URL => $url,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $postData
+                //,CURLOPT_FOLLOWLOCATION => true
+            ));
+            
+
+            //Ignore SSL certificate verification
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+
+            
+            //get response
+            $output = curl_exec($ch);
+            
+            //Print error if any
+            if(curl_errno($ch))
+            {
+                return false;
+               // echo 'error:' . curl_error($ch);
+            }
+            
+            curl_close($ch);
+            
         return true;
     }
 }

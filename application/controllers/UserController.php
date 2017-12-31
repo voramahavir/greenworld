@@ -75,13 +75,19 @@ class UserController extends CI_Controller {
 		$this->UserModel->updateLatLong($id);
 	}
 
-	public function splash($id = '') {
+	public function verifyUser($id='')
+	{
+		$this->load->model('UserModel');
+		$this->UserModel->verifyUser($id);
+	}
+
+	public function splash() {
 		if (is_file('maintenance.txt')) {
 			echo json_encode(array("success" => true, "msg" => "maintenance break"));
-        	exit();
+	    	exit();
 		} else {
 			echo json_encode(array("success" => false, "msg" => ""));
-        	exit();
+	    	exit();
 		}
 	}
 }

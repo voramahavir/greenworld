@@ -11,17 +11,20 @@ class ArticlesModel extends CI_Model {
         $data = array();
         $success = false;
         $msg = checkParams($_POST);
-        if (empty($msg)) {
+        if ($msg === '') {
+
             $target_path = './assets/articles/';
             if (!file_exists($target_path)) {
                 mkdir($target_path, 0777, true);
             }
             if (isset($_FILES['image']['name'])) {
+    
                 $exp = explode(".", $_FILES['image']['name']);
                 $extension = end($exp);
                 $file_name = md5(''.time());
                 $target_path = $target_path . '/'. $file_name .'.'. $extension ;
                 if (move_uploaded_file($_FILES['image']['tmp_name'], $target_path)) {
+        
                     $_POST['image_url'] = '/assets/articles/'. $file_name. '.'.$extension;
                     $this->db->insert("articles", $_POST);
                     if($this->db->insert_id()) {
@@ -31,9 +34,11 @@ class ArticlesModel extends CI_Model {
                         $msg = "Oops! error adding article.";
                     }
                 } else {
+        
                     $msg = "Error in uploading file, Try again.";
                 }
             } else {
+    
                 $this->db->insert("articles",$_POST);
                 if($this->db->insert_id()){
                     $success = true;
@@ -42,9 +47,11 @@ class ArticlesModel extends CI_Model {
                     $msg = "Oops! error adding article.";
                 }
             }
+        } else {
+            $msg = 'Invalid Content';
         }
         echo json_encode(array("success" => $success,"msg" => $msg));
-        exit();
+        exit;
 	}
 
     public function get($id=0)
@@ -81,7 +88,7 @@ class ArticlesModel extends CI_Model {
         if(!empty($search)){$this->db->like("a.description",$search);}
         $this->db->where("a.is_active",1);
         $this->db->select('id,description,image_url,url,title,a.is_active,a.user_id,a.created_at,CONCAT(u.first_name, " ",u.last_name) as user_fullname,u.profile_pic as user_profile_pic');
-        $this->db->join('users as u','u.user_id = a.user_id');
+        $this->db->join('users as u','u.user_id = a.user_id', 'left');
         $output['data'] = $this->db->get('articles as a')->result();
         if(!empty($search)){$this->db->like("a.description",$search);}
         if($id>0){
