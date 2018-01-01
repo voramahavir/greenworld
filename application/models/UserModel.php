@@ -50,7 +50,7 @@ class UserModel extends CI_Model {
                 if (!file_exists($target_path)) {
                     mkdir($target_path, 0777, true);
                 }
-                if (isset($_FILES['image']['name'])  && $_FILES['image']['name'] != '') {
+                if (isset($_FILES['image']['name']) && $_FILES['image']['name'] != '') {
                     $exp = explode(".", $_FILES['image']['name']);
                     $extension = end($exp);
                     $file_name = md5(''.time());
@@ -199,7 +199,7 @@ class UserModel extends CI_Model {
     public function updateUser($id='')
     {
         $success = false;
-        $msg = checkParams($_POST,'first_name,last_name,phone_no,email,birth_date');
+        $msg = checkParams($_POST,'first_name,phone_no,email');
         if(empty($msg)){
             $target_path = './assets/profilePics/';
             if (!file_exists($target_path)) {
@@ -217,9 +217,9 @@ class UserModel extends CI_Model {
                 }
             }
             $count = 0;
-            if($_POST['password'] === ''){
+            if(isset($_POST['password']) && $_POST['password'] === ''){
                 unset($_POST['password']);
-            } else {
+            } else if (isset($_POST['password'])) {
                 $_POST['password'] = md5($_POST['password']);
             }
             $this->db->where('user_id', $id);
