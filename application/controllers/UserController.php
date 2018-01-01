@@ -90,4 +90,9 @@ class UserController extends CI_Controller {
 	    	exit();
 		}
 	}
+
+	public function resendOtp($id='') {
+		$this->load->model('UserModel');
+		$this->UserModel->resendOtp($id);
+	}
 }

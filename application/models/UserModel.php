@@ -313,4 +313,16 @@ class UserModel extends CI_Model {
             
         return true;
     }
+
+    public function resendOtp($id) {
+        $res = $this->db->query("SELECT user_id, phone_no, is_verified FROM users WHERE user_id = '".$id."' AND is_active = 1")->first_row();
+        if (count($res) && $res->is_verified == 0) {
+            $otp = rand(100000,999999);
+            $this->send_sms($otp, $res->phone_no);
+            $res->otp = $otp;
+            $output = array('success' => true, 'message' => "Otp send successfully", 'data' => $res);
+        } else {
+            $output = array('success' => false, 'message' => "Already verified user", 'data' => $res);
+        }
+    }
 }
