@@ -40,7 +40,7 @@ class UserModel extends CI_Model {
         $msg = checkParams($_POST,'first_name,phone_no,password');
         if (empty($msg)) {
             $q = $this->db->or_where(array(
-                'email' => $_POST['email'],'phone_no' => $_POST['phone_no']
+                'phone_no' => $_POST['phone_no']
             ))->get("users");
             $num_rows = $q->num_rows();
             if($num_rows>0){
@@ -256,6 +256,7 @@ class UserModel extends CI_Model {
     public function verifyUser($id='')
     {
         $success = false;
+        $msg = '';
         if(!empty($id)) {
             $this->db->where('user_id', $id);
             $count = $this->db->update("users", array('is_verified' => 1));
@@ -368,6 +369,21 @@ class UserModel extends CI_Model {
             }
         }
         echo json_encode(array("success" => $success, "msg" => $msg));
+        exit();
+    }
+
+    public function resendOtp($id) {
+        $output = array();
+        $res = $this->db->query("SELECT user_id, phone_no, is_verified FROM users WHERE user_id = '".$id."' AND is_active = 1")->first_row();
+        if (count($res) && $res->is_verified == 0) {
+            $otp = rand(100000,999999);
+            $this->send_sms($otp, $res->phone_no);
+            $res->otp = $otp;
+            $output = array('success' => true, 'message' => "Otp send successfully", 'data' => $res);
+        } else {
+            $output = array('success' => false, 'message' => "Already verified user", 'data' => $res);
+        }
+        echo json_encode($output);
         exit();
     }
 }

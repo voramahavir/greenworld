@@ -75,7 +75,7 @@ class UserController extends CI_Controller {
 		$this->UserModel->updateLatLong($id);
 	}
 
-	public function verifyUser($id='')
+	public function verify($id='')
 	{
 		$this->load->model('UserModel');
 		$this->UserModel->verifyUser($id);
@@ -101,5 +101,10 @@ class UserController extends CI_Controller {
 	{
 		$this->load->model('UserModel');
 		$this->UserModel->sendEmail();
+	}
+
+	public function resendOtp($id='') {
+		$this->load->model('UserModel');
+		$this->UserModel->resendOtp($id);
 	}
 }
