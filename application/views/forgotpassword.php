@@ -93,18 +93,18 @@
         alert('Password must be same.');
       } else if($('[name="cpassword"]').val() != $('[name="password"]').val()){
         alert('Both password must be same.');
-      } else 
+      } else {
         $.ajax({
-          url: "<?php echo site_url('LoginController/login'); ?>",
+          url: "<?php echo site_url('forgotPassword/resetPassword/'); ?>"+id,
           method: 'POST',
           data: {user_id: id, password: $('[name="cpassword"]').val()},
           dataType: "json",
           success: function(result) {
-            console.log(result);
             if (result.success) {
-              window.location.href = "<?php echo base_url(''); ?>";
+              alert(result.msg);
+              window.location.href = "http://www.regreen.co.in";
             } else {
-              alert('Invalid credential');
+              alert(result.msg);
             }
           }
         });

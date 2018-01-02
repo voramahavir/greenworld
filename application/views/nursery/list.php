@@ -98,6 +98,13 @@
                               </div>
                           </div>
                           <div class="row form-group">
+                              <label class="col-md-3 text-right"> Plant Categories : </label>
+                              <div class="col-md-9">
+                                  <select class="form-control plant_categories col-md-9" name='plant_categories' multiple="multiple">
+                                  </select>
+                              </div>
+                          </div>
+                          <div class="row form-group">
                               <label class="col-md-3 text-right"> Plants : </label>
                               <div class="col-md-9">
                                   <select class="form-control plant col-md-9" name='plant' multiple="multiple">
@@ -295,12 +302,29 @@
       var id=0;
       var newplants = [];
       var oldplants = [];
+      var categories = [];
       var selectedIndex = -1;
       $(document).ready(function(){
         $.fn.select2.defaults.set("theme", "bootstrap");
         $(".plant").select2({
             closeOnSelect: false,
             placeholder: 'Select Multiple Plants'
+        });
+        $(".plant_categories").select2({
+            closeOnSelect: false,
+            placeholder: 'Select Plant Categories'
+        });
+        $.ajax({
+            url: "<?php echo site_url('plant_category/get'); ?>",
+            type: 'POST',
+            success: function (data) {
+              categoryHtml = '';
+              data = JSON.parse(data);
+              categories = data.data;
+            },
+            cache: false,
+            contentType: false,
+            processData: false
         });
         getPlants();
         table = $('#table_nursery').DataTable({
@@ -472,6 +496,15 @@
           }));
         }
       });
+      $(".plant_categories").select2("val", "");
+      $.each(categories, function (i, item) {
+        if(item.is_active == 1){
+          $('.plant_categories').append($('<option>', { 
+              value: item.id,
+              text : item.name 
+          }));
+        }
+      });
       $(".select2").css("width", "100%");
       $(".select2-search__field").css("width", "100%");
     }
@@ -564,7 +597,7 @@
         loadingStart();
         var formData = new FormData(form);
         $.ajax({
-            url: "<?php echo site_url('nursery/add?plant='); ?>"+$('.plant').val(),
+            url: "<?php echo site_url('nursery/add?plant='); ?>"+$('.plant').val()+"&plant_categories="+$('.plant_categories').val(),
             type: 'POST',
             data: formData,
             success: function (data) {

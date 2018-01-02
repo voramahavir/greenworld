@@ -16,4 +16,9 @@ class ForgotPasswordController extends CI_Controller {
 		$this->load->model('ForgotPasswordModel');
 		$this->ForgotPasswordModel->checkToken($token);
 	}
+
+	public function resetPassword($id="") {
+		$this->load->model('ForgotPasswordModel');
+		$this->ForgotPasswordModel->resetPassword($id);
+	}
 }

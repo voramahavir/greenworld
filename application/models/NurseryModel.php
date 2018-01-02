@@ -10,10 +10,12 @@ class NurseryModel extends CI_Model {
 	}
 	public function add(){
         $plants = !empty($_GET['plant']) ? explode(',', $_GET['plant']) : '';
+        $plant_categories = !empty($_GET['plant_categories']) ? explode(',', $_GET['plant_categories']) : '';
         $data = array();
         $success = false;
         $msg = checkParams($_POST,'name,contact_no');
         unset($_POST['plant']);
+        unset($_POST['plant_categories']);
         if (empty($msg)) {
             $target_path = './assets/nursery/';
             if (!file_exists($target_path)) {
@@ -32,14 +34,23 @@ class NurseryModel extends CI_Model {
             } 
             if(empty($msg)){
                 $this->db->insert("nursery",$_POST);
+                $nursery_id = $this->db->insert_id();
                 if($this->db->insert_id()){
                     if($plants != ''){
                         $data = array();
                         for ($i=0; $i < count($plants); $i++) { 
-                            $arr = array('plant_id' => $plants[$i], 'nursery_id' => $this->db->insert_id());
+                            $arr = array('plant_id' => $plants[$i], 'nursery_id' => $nursery_id);
                             array_push($data, $arr);
                         }
                         $this->db->insert_batch("plant_nursery_link",$data);
+                    }
+                    if($plant_categories != ''){
+                        $data = array();
+                        for ($i=0; $i < count($plant_categories); $i++) { 
+                            $arr = array('category_id' => $plant_categories[$i], 'nursery_id' => $nursery_id);
+                            array_push($data, $arr);
+                        }
+                        $this->db->insert_batch("nursery_plant_category_link",$data);
                     }
                     $success = true;
                     $msg = "Nursery added successfully.";

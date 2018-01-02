@@ -73,7 +73,7 @@
                       <div class="col-md-9">
                           <div class="row form-group">
                               <div class="col-md-12">
-                                  <img style='height:500px; widht:500px;' name='image' />
+                                  <img style='height:500px; width:500px;' name='image' />
                               </div>
                           </div>
                       </div>
