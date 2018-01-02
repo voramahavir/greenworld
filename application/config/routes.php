@@ -82,3 +82,6 @@ $route['bills/(:any)/(:any)'] = 'BillsController/$1/$2';
 $route['codes'] = 'CodeController';
 $route['codes/(:any)'] = 'CodeController/$1';
 $route['codes/(:any)/(:any)'] = 'CodeController/$1/$2';
+$route['forgotPassword'] = 'ForgotPasswordController';
+$route['forgotPassword/(:any)'] = 'ForgotPasswordController/$1';
+$route['forgotPassword/(:any)/(:any)'] = 'ForgotPasswordController/$1/$2';

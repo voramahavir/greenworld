@@ -37,7 +37,7 @@ class UserModel extends CI_Model {
 	public function register(){
         $data = array();
         $success = false;
-        $msg = checkParams($_POST,'first_name,phone_no,email,password');
+        $msg = checkParams($_POST,'first_name,phone_no,password');
         if (empty($msg)) {
             $q = $this->db->or_where(array(
                 'email' => $_POST['email'],'phone_no' => $_POST['phone_no']
@@ -199,7 +199,7 @@ class UserModel extends CI_Model {
     public function updateUser($id='')
     {
         $success = false;
-        $msg = checkParams($_POST,'first_name,phone_no,email');
+        $msg = checkParams($_POST,'first_name,phone_no');
         if(empty($msg)){
             $target_path = './assets/profilePics/';
             if (!file_exists($target_path)) {
@@ -312,5 +312,62 @@ class UserModel extends CI_Model {
         }
             
         return true;
+    }
+
+    public function changePassword($id='')
+    {
+        $success = false;
+        $msg = checkParams($_POST,'old_password,new_password');
+        if($msg === '' && !empty($id)) {
+            $old_password = md5($_POST['old_password']);
+            $this->db->where('user_id', $id);
+            $this->db->where('password', $old_password);
+            $res = $this->db->select('user_id')->get('users')->first_row();
+            if(isset($res->user_id)){
+                $this->db->where('user_id', $id);
+                $count = $this->db->update("users", array('password' => md5($_POST['new_password'])));
+                if($count > 0){
+                    $success = true;
+                    $msg = 'Password changed successfully';
+                }else{
+                    $msg = 'Error changing password, Try again.';
+                }
+            } else {
+                $msg = 'Wrong old password.';
+            }
+        }
+        echo json_encode(array("success" => $success, "msg" => $msg));
+        exit();
+    }
+
+    public function sendEmail()
+    {
+        $success = false;
+        $msg = checkParams($_POST,'email');
+        if($msg === ''){
+            $this->db->where('email', $_POST['email']);
+            $res = $this->db->select('user_id')->get('users')->first_row();
+            if(isset($res->user_id)){
+                $token = bin2hex(random_bytes(10));
+                $this->load->library('email');
+                $email_body ="Reset password link : ".site_url('forgotPassword?token=').$token;
+                $this->email->from('regreenamd@gmail.com', 'ReGreen');
+                $list = array($_POST['email']);
+                $this->email->to($list);
+                $this->email->subject('Forgot Password');
+                $this->email->message($email_body);
+                $this->email->send();
+                $data = array('token' => $token, 'user_id' => $res->user_id);
+                $this->db->insert('forgot_password',$data);
+                if($this->db->insert_id()){
+                    $success = true;
+                    $msg = "Email sent successfully.";
+                }
+            } else {
+                $msg = 'Email address does not exist.';
+            }
+        }
+        echo json_encode(array("success" => $success, "msg" => $msg));
+        exit();
     }
 }

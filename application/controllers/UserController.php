@@ -90,4 +90,16 @@ class UserController extends CI_Controller {
 	    	exit();
 		}
 	}
+
+	public function changePassword($id='')
+	{
+		$this->load->model('UserModel');
+		$this->UserModel->changePassword($id);
+	}
+
+	public function forgotPassword()
+	{
+		$this->load->model('UserModel');
+		$this->UserModel->sendEmail();
+	}
 }
