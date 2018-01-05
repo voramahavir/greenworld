@@ -381,8 +381,6 @@
       var data = [];
       var nurserys = [];
       var categories =[];
-      var newnursery = [];
-      var oldnursery = [];
       var selectedIndex = -1;
       var id=0;
       $(document).ready(function(){
@@ -552,6 +550,7 @@
       $("#editPlantModal").find("[name=category_id]").html(categoryHtml);
       $("#editPlantModal").find("[name=category_id]").val(data[index].categoryid);
       id = aid;
+      $('.nurserys').html('');
       $.each(nurserys.data, function (i, item) {
         if(item.is_active == 1){
           $('.nurserys').append($('<option>', { 
@@ -567,48 +566,27 @@
         $('.nurserys').val(array).change();
       }
       $('.nurserys').on("select2:selecting", function(e) { 
-        if(data[selectedIndex].nurserys != null){
-          var array = JSON.parse("[" + data[selectedIndex].nurserys + "]");
+          var array = $('.nurserys').val();
           var index = array.indexOf(e.params.args.data.id);
           if(index <= -1){
-            newnursery.push(e.params.args.data.id);
+            array.push(e.params.args.data.id);
           }
-          index = oldnursery.indexOf(e.params.args.data.id);
-          if (index > -1) {
-              oldnursery.splice(index, 1);
-          }
-        } else {
-          newnursery.push(e.params.args.data.id);
-        }
-        console.log('selecting',oldnursery);
-        console.log('selecting',newnursery);
-      });
-      $(".nurserys").on("select2:select", function(evt) {
-        var element = evt.params.data.element;
-        var $element = $(element);
-        $element.detach();
-        $(this).append($element);
-        $(this).trigger("change");
-        console.log('select',oldnursery);
-        console.log('select',newnursery);
+          $('.nurserys').val('').change();
+          $('.nurserys').val(array).change();
       });
       $(".nurserys").on("select2:unselecting", function(e) {
-        var array = JSON.parse("[" + data[selectedIndex].nurserys + "]");
-        var index = array.indexOf(e.params.args.data.id);
-        console.log(index);
-        if(index <= -1){
-          oldnursery.push(e.params.args.data.id);
-        }
-        index = newnursery.indexOf(e.params.args.data.id);
-        if (index > -1) {
-            newnursery.splice(index, 1);
-        }
-        console.log('unselecting',oldnursery);
-        console.log('unselecting',newnursery);
+          var array = $('.nurserys').val();
+          var index = array.indexOf(e.params.args.data.id);
+          if(index > -1){
+            array.splice(index, 1);
+          }
+          $('.nurserys').val('').change();
+          $('.nurserys').val(array).change();
       });
     }
     function AddTheRow(){
       $("#addPlantModal").modal("show");
+      $('.nurserys').html('');
       $(".nurserys").select2("val", "");
       categoryHtml = '';
       categoryHtml='<option value>Select Category</option>';
@@ -720,7 +698,7 @@
       loadingStart();
       var formData = new FormData(form);
         $.ajax({
-            url: "<?php echo site_url('plant/edit/');?>"+id+"?old="+oldnursery+"&new="+newnursery,
+            url: "<?php echo site_url('plant/edit/');?>"+id+"?nurserys="+$('.nurserys').val(),
             type: 'POST',
             data: formData,
             success: function (data) {

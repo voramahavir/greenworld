@@ -23,8 +23,8 @@ class BillsController extends CI_Controller {
 		$this->BillsModel->add();
 	}
 
-	public function get() {
-		$this->BillsModel->get();
+	public function get($id='') {
+		$this->BillsModel->get($id);
 	}
 
 	public function confirm($id=""){

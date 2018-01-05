@@ -177,6 +177,13 @@
                               </div>
                           </div>
                           <div class="row form-group">
+                              <label class="col-md-3 text-right"> Plant Categories : </label>
+                              <div class="col-md-9">
+                                  <select class="form-control plant_categories col-md-9" name='plant_categories' multiple="multiple">
+                                  </select>
+                              </div>
+                          </div>
+                          <div class="row form-group">
                               <label class="col-md-3 text-right"> Plants : </label>
                               <div class="col-md-9">
                                   <select class="form-control plant col-md-9" name='plant' multiple="multiple">
@@ -300,8 +307,6 @@
       var data = [];
       var plants = [];
       var id=0;
-      var newplants = [];
-      var oldplants = [];
       var categories = [];
       var selectedIndex = -1;
       $(document).ready(function(){
@@ -439,63 +444,88 @@
       base_url = "<?php echo base_url(); ?>"+data[index].image_url;
       $("#editNurseryModal").find("[name=eimage]").attr("src",base_url);
       id = aid;
+      $('.plant').html('');
       $.each(plants.data, function (i, item) {
         if(item.is_active == 1){
           $('.plant').append($('<option>', { 
               value: item.id,
-              text : item.name 
+              text : item.local_name 
           }));
         }
       });
       $(".select2").css("width", "100%");
       $(".select2-search__field").css("width", "100%");
+      $('.plant').val('').change();
       if(data[index].plants != null){
         var array = JSON.parse("[" + data[index].plants + "]");
         $('.plant').val(array).change();
       }
       $('.plant').on("select2:selecting", function(e) { 
-        if(data[selectedIndex].plants != null){
-          var array = JSON.parse("[" + data[selectedIndex].plants + "]");
+          var array = $('.plant').val();
           var index = array.indexOf(e.params.args.data.id);
           if(index <= -1){
-            newplants.push(e.params.args.data.id);
+            array.push(e.params.args.data.id);
           }
-          index = oldplants.indexOf(e.params.args.data.id);
-          if (index > -1) {
-              oldplants.splice(index, 1);
-          }
-        }
-      });
-      $(".plant").on("select2:select", function(evt) {
-        var element = evt.params.data.element;
-        var $element = $(element);
-        $element.detach();
-        $(this).append($element);
-        $(this).trigger("change");
+          $('.plant').val('').change();
+          $('.plant').val(array).change();
       });
       $(".plant").on("select2:unselecting", function(e) {
-        var array = JSON.parse("[" + data[selectedIndex].plants + "]");
+        var array = $('.plant').val();
         var index = array.indexOf(e.params.args.data.id);
-        if(index <= -1){
-          oldplants.push(e.params.args.data.id);
-        }
-        index = newplants.indexOf(e.params.args.data.id);
         if (index > -1) {
-            newplants.splice(index, 1);
+            array.splice(index, 1);
         }
+        $('.plant').val('').change();
+        $('.plant').val(array).change();
       });
-    }
-    function AddTheRow(){
-      $("#addNurseryModal").modal("show");
-      $(".plant").select2("val", "");
-      $.each(plants.data, function (i, item) {
+
+      $('.plant_categories').html('');
+      $.each(categories, function (i, item) {
         if(item.is_active == 1){
-          $('.plant').append($('<option>', { 
+          $('.plant_categories').append($('<option>', { 
               value: item.id,
               text : item.name 
           }));
         }
       });
+      $('.plant_categories').val('').change();
+      if(data[index].plant_categories != null){
+        var array = JSON.parse("[" + data[index].plant_categories + "]");
+        $('.plant_categories').val(array).change();
+      }
+      $('.plant_categories').on("select2:selecting", function(e) { 
+          var array = $('.plant_categories').val();
+          var index = array.indexOf(e.params.args.data.id);
+          if(index <= -1){
+            array.push(e.params.args.data.id);
+          }
+          $('.plant_categories').val('').change();
+          $('.plant_categories').val(array).change();
+      });
+      $(".plant_categories").on("select2:unselecting", function(e) {
+        var array = $('.plant_categories').val();
+        var index = array.indexOf(e.params.args.data.id);
+        if (index > -1) {
+            array.splice(index, 1);
+        }
+        $('.plant_categories').val('').change();
+        $('.plant_categories').val(array).change();
+      });
+    }
+    function AddTheRow(){
+      $("#addNurseryModal").modal("show");
+      $('.plant').html('');
+      $(".plant").select2("val", "");
+      $.each(plants.data, function (i, item) {
+        if(item.is_active == 1){
+          $('.plant').append($('<option>', { 
+              value: item.id,
+              text : item.local_name 
+          }));
+        }
+      });
+      $('.plant').val('').change();
+      $('.plant_categories').html('');
       $(".plant_categories").select2("val", "");
       $.each(categories, function (i, item) {
         if(item.is_active == 1){
@@ -505,6 +535,7 @@
           }));
         }
       });
+      $('.plant_categories').val('').change();
       $(".select2").css("width", "100%");
       $(".select2-search__field").css("width", "100%");
     }
@@ -618,7 +649,7 @@
         loadingStart();
         var formData = new FormData(form);
         $.ajax({
-            url: "<?php echo site_url('nursery/edit/');?>"+id+"?old="+oldplants+"&new="+newplants,
+            url: "<?php echo site_url('nursery/edit/');?>"+id+"?plant="+$('.plant').val()+"&plant_categories="+$('.plant_categories').val(),
             type: 'POST',
             data: formData,
             success: function (data) {

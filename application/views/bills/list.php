@@ -24,6 +24,7 @@
                             <th>Name</th>
                             <th>Image</th>
                             <th>Amount</th>
+                            <th>Nursery Name</th>
                             <th>Status</th>
                             <th>Action</th>
                           </tr>
@@ -47,6 +48,16 @@
                   <span aria-hidden="true">×</span>
                 </button>
                 <h4 class="modal-title">Are you sure you want to do this ?</h4>
+              </div>
+              <div class="modal-body">
+                    <div class="row form-group">
+                        <label class="col-md-3 text-right"> Nursery : </label>
+                        <div class="col-md-9">
+                            <select class="form-control select nurname" name='nurname'>
+                                <option value="0">Select Nursery</option>
+                            </select>
+                        </div>
+                    </div>
                 <input type="hidden" name="id" value="">
                 <input type="hidden" name="status" value="">
               </div>
@@ -96,8 +107,10 @@
     <script type="text/javascript">
       var table = null;
       var data = [];
+      var nurserys =[];
       var id=0;
       $(document).ready(function(){
+        getNursery();
         table = $('#table_bills').DataTable({
           "paging": true,
           "lengthChange": true,
@@ -124,6 +137,10 @@
                 "bSortable": false
               },
               {
+                "data": "nurname", 
+                "bSortable": false
+              },
+              {
                 "data": null, 
                 "bSortable": false
               },
@@ -147,8 +164,8 @@
                   +"<img style='height:50px; widht:50px;' src='"+base_url+"' onclick='return fullImage("+iDisplayindex+","+aData.id+");'>"
               +"");
               if(aData.is_confirm==1){
-                  $('td:eq(3)',nRow).html("Cancelled");
-                  $('td:eq(4)',nRow).html(""
+                  $('td:eq(4)',nRow).html("Cancelled");
+                  $('td:eq(5)',nRow).html(""
                       +"<button class='btn btn-success' onclick='return ConfirmBill("+iDisplayindex+","+aData.id+",2);'>"
                       +"<i class='fa fa-check'></i>"
                       +"</button>"
@@ -157,8 +174,8 @@
                       +"</button>"
                   +"");
               } else if (aData.is_confirm==2){
-                  $('td:eq(3)',nRow).html("Confirmed");
-                  $('td:eq(4)',nRow).html(""
+                  $('td:eq(4)',nRow).html("Confirmed");
+                  $('td:eq(5)',nRow).html(""
                       +"<button class='btn btn-success' disabled onclick='return ConfirmBill("+iDisplayindex+","+aData.id+",2);'>"
                       +"<i class='fa fa-check'></i>"
                       +"</button>"
@@ -167,8 +184,8 @@
                       +"</button>"
                   +"");
               }else{
-                  $('td:eq(3)',nRow).html("Pending");
-                  $('td:eq(4)',nRow).html(""
+                  $('td:eq(4)',nRow).html("Pending");
+                  $('td:eq(5)',nRow).html(""
                       +"<button class='btn btn-success' onclick='return ConfirmBill("+iDisplayindex+","+aData.id+",2);'>"
                       +"<i class='fa fa-check'></i>"
                       +"</button>"
@@ -184,6 +201,15 @@
       $("#confirmModal").modal("show");
       $("#confirmModal").find("[name=id]").attr("value",id);
       $("#confirmModal").find("[name=status]").attr("value",status);
+      categoryHtml = '';
+      categoryHtml='<option value>Select Nursery</option>';
+      $.each(nurserys,function(i,e){
+          if(e.is_active == 1){
+            categoryHtml+='<option value="'+e.name+'">'+e.name+'</option>';
+          }
+      });
+      $("#confirmModal").find("[name=nurname]").html(categoryHtml);
+      $("#confirmModal").find("[name=nurname]").val(data[index].nurname);
     }
     function fullImage(index,id) {
       if(data[index].image_url) {
@@ -198,8 +224,10 @@
       var id=-1;
       id=$("#confirmModal").find("[name=id]").val();
       value=$("#confirmModal").find("[name=status]").val();
+      nurname = $("#confirmModal").find("[name=nurname]").val();
       $.post("<?php echo site_url('bills/confirm/'); ?>"+id,{
-          is_confirm : value
+          is_confirm : value,
+          nurname : nurname
       })
       .done(function(result){
           result=JSON.parse(result);
@@ -209,6 +237,18 @@
           $("#confirmModal").modal("hide");
       });
     }
-    
+    function getNursery() {
+        $.ajax({
+            url: "<?php echo site_url('nursery/get'); ?>",
+            type: 'POST',
+            success: function (data) {
+              data = JSON.parse(data);
+              nurserys = data.data;
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
     </script>
 <?php $this->load->view('include/page_footer.php'); ?>

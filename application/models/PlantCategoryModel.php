@@ -13,6 +13,7 @@ class PlantCategoryModel extends CI_Model {
         $success = false;
         $msg = checkParams($_POST);
         if (empty($msg)) {
+            $_POST = getSetData($_POST,'name');
             $this->db->insert("plant_category",$_POST);
             if($this->db->insert_id()){
                 $success = true;
@@ -105,6 +106,7 @@ class PlantCategoryModel extends CI_Model {
         $success = false;
         $msg = checkParams($_POST);
         if (empty($msg)) {
+            $_POST = getSetData($_POST,'name');
             $this->db->where('id', $id);
             $count = $this->db->update("plant_category",$_POST);
             if($count){

@@ -15,6 +15,10 @@ class ArticlesController extends CI_Controller {
 		// $this->load->view('login');
 	}
 
+	public function list() {
+		$this->load->view('articles/list');
+	}
+
 	public function add() {
 		$this->ArticlesModel->add();
 	}
@@ -25,5 +29,21 @@ class ArticlesController extends CI_Controller {
 
 	public function upvote(){
 		$this->ArticlesModel->upvote();
+	}
+
+	public function update($id=''){
+		$this->ArticlesModel->update($id);
+	}
+
+	public function delete($id=""){
+		$this->ArticlesModel->delete($id);
+	}
+
+	public function recover($id=""){
+		$this->ArticlesModel->recover($id);
+	}
+
+	public function import() {
+		$this->ArticlesModel->bulkUpload();
 	}
 }

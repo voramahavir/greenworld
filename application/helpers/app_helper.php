@@ -134,6 +134,21 @@ if (!function_exists('checkParams')) {
     }
 }
 
+if (!function_exists('getSetData')) {
+
+    function getSetData($post,$params='')
+    {
+        $arr = array();
+        $params = explode(',', $params);
+        foreach ($params as $value) {
+            if(isset($post[$value])) {
+                $arr[$value] = $post[$value];
+            }
+        }
+        return $arr;
+    }
+}
+
 if(!function_exists('parseExcel')) {
     
     function parseExcel($object, $sheetno = 0, $dateCol = -1)
@@ -190,5 +205,16 @@ if(!function_exists('parseExcel')) {
         {
             return $excelArray;
         }
+    }
+}
+if(!function_exists('custom_log')) {
+    
+    function custom_log($filename = '', $content = array())
+    {
+        $path = 'logs';
+        if(!is_dir($path)){
+            mkdir($path,0777);
+        }
+        file_put_contents($path . '/' . $filename . '.txt', $content, FILE_APPEND);
     }
 }

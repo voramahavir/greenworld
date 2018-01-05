@@ -17,6 +17,7 @@ class NurseryModel extends CI_Model {
         unset($_POST['plant']);
         unset($_POST['plant_categories']);
         if (empty($msg)) {
+            $_POST = getSetData($_POST,'name,contact_no,address,latitude,longitude');
             $target_path = './assets/nursery/';
             if (!file_exists($target_path)) {
                 mkdir($target_path, 0777, true);
@@ -92,7 +93,7 @@ class NurseryModel extends CI_Model {
             'search' => $search
         );
         if(!empty($search)){$this->db->like("name",$search);}
-        $output['data'] = $this->db->query("SELECT A.id,name,contact_no,address,image_url,A.is_active,latitude,longitude,group_concat(`plant_id` separator ',') as plants from nursery as A left join plant_nursery_link as B on A.id = B.nursery_id and B.is_active = 1 GROUP BY A.id")->result();
+        $output['data'] = $this->db->query("SELECT A.id,name,contact_no,address,image_url,A.is_active,latitude,longitude,group_concat(`plant_id` separator ',') as plants, group_concat(`category_id` separator ',') as plant_categories from nursery as A left join plant_nursery_link as B on A.id = B.nursery_id left join nursery_plant_category_link as C on A.id = C.nursery_id GROUP BY A.id")->result();
         if(!empty($search)){$this->db->like("name",$search);}
         $output['recordsTotal']=$this->db->get('nursery')->num_rows();
         $output['recordsFiltered']=$output['recordsTotal'];
@@ -139,13 +140,15 @@ class NurseryModel extends CI_Model {
 
     public function updateNursery($id='')
     {
-        $newplants = !empty($_GET['new']) ? explode(',', $_GET['new']) : '';
-        $oldplants = !empty($_GET['old']) ? explode(',', $_GET['old']) : '';
+        $plant_categories = !empty($_GET['plant_categories']) ? explode(',', $_GET['plant_categories']) : '';
+        unset($_POST['plant_categories']);
+        $plants = !empty($_GET['plant']) ? explode(',', $_GET['plant']) : '';
         unset($_POST['plant']);
         $data = array();
         $success = false;
         $msg = checkParams($_POST,'name,contact_no');
         if (empty($msg)) {
+            $_POST = getSetData($_POST,'name,contact_no,address,latitude,longitude');
             $target_path = './assets/nursery/';
             if (!file_exists($target_path)) {
                 mkdir($target_path, 0777, true);
@@ -179,20 +182,23 @@ class NurseryModel extends CI_Model {
                 }
             }
             if($success){
-                if(!empty($newplants)){
+                $this->db->where('nursery_id',$id)->delete('plant_nursery_link');
+                $this->db->where('nursery_id',$id)->delete('nursery_plant_category_link');
+                if(!empty($plants)){
                     $data = array();
-                    for ($i=0; $i < count($newplants); $i++) { 
-                        $arr = array('plant_id' => $newplants[$i], 'nursery_id' => $id);
+                    for ($i=0; $i < count($plants); $i++) { 
+                        $arr = array('plant_id' => $plants[$i], 'nursery_id' => $id);
                         array_push($data, $arr);
                     }
                     $this->db->insert_batch("plant_nursery_link",$data);
                 }
-                if(!empty($oldplants)){
+                if($plant_categories != ''){
                     $data = array();
-                    for ($i=0; $i < count($oldplants); $i++) { 
-                        $where = array('plant_id' => $oldplants[$i], 'nursery_id' => $id);
-                        $this->db->where($where)->set(array('is_active' => 0))->update("plant_nursery_link");
+                    for ($i=0; $i < count($plant_categories); $i++) { 
+                        $arr = array('category_id' => $plant_categories[$i], 'nursery_id' => $id);
+                        array_push($data, $arr);
                     }
+                    $this->db->insert_batch("nursery_plant_category_link",$data);
                 }
             }
         }

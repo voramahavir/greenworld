@@ -49,6 +49,11 @@
             <i class="fa fa-users"></i> <span>Codes</span>
           </a>
         </li>
+        <li class="<?php echo isset($page_title) && $page_title == 'Articles' ? ' active' : ''; ?>">
+          <a href="<?php echo site_url('articles/list'); ?>">
+            <i class="fa fa-users"></i> <span>Articles</span>
+          </a>
+        </li>
       </ul>
     </section>
     <!-- /.sidebar -->

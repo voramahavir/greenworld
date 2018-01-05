@@ -17,7 +17,8 @@ class UserModel extends CI_Model {
 			$res = $this->db->query("SELECT user_id, first_name, last_name, email, user_name, phone_no, is_verified FROM users WHERE (user_name = '".$user_name."' OR email = '".$user_name."' OR phone_no = '".$user_name."') AND password = '".$password."' AND is_active = 1")->first_row();
 			if (count($res)) {
                 $otp = rand(100000,999999);
-                $this->send_sms($otp, $res->phone_no);
+                $message = $otp . " otp to verify your number.";
+                $this->send_sms($message, $res->phone_no);
                 $res->otp = $otp;
 				$output = array('success' => true, 'message' => "Login Successfully", 'data' => (object)$res);
                 if(isset($_POST['latitude']) && isset($_POST['longitude'])){
@@ -39,6 +40,7 @@ class UserModel extends CI_Model {
         $success = false;
         $msg = checkParams($_POST,'first_name,phone_no,password');
         if (empty($msg)) {
+            $_POST = getSetData($_POST,'first_name,last_name,user_name,email,password,phone_no,city,birth_date,sex,user_type,device_id,os,user_fb_id,user_g_id,latitude,longitude,push_key,country_code,bio,app_version');
             $q = $this->db->or_where(array(
                 'phone_no' => $_POST['phone_no']
             ))->get("users");
@@ -70,7 +72,8 @@ class UserModel extends CI_Model {
                         $msg = "User registered successfully.";
                         $data = $this->db->select('user_id,first_name,last_name,email,user_name,phone_no')->where('user_id',$id)->get("users")->first_row();
                         $otp = rand(100000,999999);
-                        $this->send_sms($otp, $data->phone_no);
+                        $message = $otp . " otp to verify your number.";
+                        $this->send_sms($message, $data->phone_no);
                         $data->otp = $otp;
                     } else{
                         $msg = "Oops! error registering user.";
@@ -201,6 +204,7 @@ class UserModel extends CI_Model {
         $success = false;
         $msg = checkParams($_POST,'first_name,phone_no');
         if(empty($msg)){
+            $_POST = getSetData($_POST,'first_name,last_name,user_name,email,password,phone_no,city,birth_date,sex,user_type,country_code,bio');
             $target_path = './assets/profilePics/';
             if (!file_exists($target_path)) {
                 mkdir($target_path, 0777, true);
@@ -240,6 +244,7 @@ class UserModel extends CI_Model {
         $success = false;
         $msg = checkParams($_POST,'latitude,longitude');
         if(!empty($id) && empty($msg)){
+            $_POST = getSetData($_POST,'latitude,longitude');
             $this->db->where('user_id', $id);
             $count = $this->db->update("users",$_POST);
             if($count > 0){
@@ -271,7 +276,7 @@ class UserModel extends CI_Model {
         exit();
     }
 
-    public function send_sms($otp='', $mobileNumber)
+    public function send_sms($message='', $mobileNumber)
     {        
         //Your authentication key
         $authKey = "190629AOn1V8cU4Y55a47ef98";
@@ -280,7 +285,7 @@ class UserModel extends CI_Model {
         $senderId = "REGREE";
         
         //Your message to send, Add URL encoding here.
-        $message = urlencode($otp . " otp to verify your number.");
+        $message = urlencode($message);
             
         $curl = curl_init();
         
@@ -344,28 +349,32 @@ class UserModel extends CI_Model {
     public function sendEmail()
     {
         $success = false;
-        $msg = checkParams($_POST,'email');
+        $msg = checkParams($_POST,'value');
         if($msg === ''){
-            $this->db->where('email', $_POST['email']);
-            $res = $this->db->select('user_id')->get('users')->first_row();
-            if(isset($res->user_id)){
+            $this->db->or_where(array('email' => $_POST['value'],'phone_no' => $_POST['value']));
+            $res = $this->db->select('user_id,email,phone_no')->get('users')->first_row();
+            if(isset($res->email) && $res->email != ''){
                 $token = bin2hex(random_bytes(10));
                 $this->load->library('email');
                 $email_body ="Reset password link : ".site_url('forgotPassword?token=').$token;
                 $this->email->from('regreenamd@gmail.com', 'ReGreen');
-                $list = array($_POST['email']);
+                $list = array($_POST['value']);
                 $this->email->to($list);
                 $this->email->subject('Forgot Password');
                 $this->email->message($email_body);
                 $this->email->send();
+                if(isset($res->phone_no) && $res->phone_no != ''){
+                    $message = "Reset password link : ".site_url('forgotPassword?token=').$token;
+                    $this->send_sms($message,$res->phone_no);
+                }
                 $data = array('token' => $token, 'user_id' => $res->user_id);
                 $this->db->insert('forgot_password',$data);
                 if($this->db->insert_id()){
                     $success = true;
-                    $msg = "Email sent successfully.";
+                    $msg = "Link sent successfully.";
                 }
             } else {
-                $msg = 'Email address does not exist.';
+                $msg = 'Email or Phone no does not exist.';
             }
         }
         echo json_encode(array("success" => $success, "msg" => $msg));
@@ -377,7 +386,8 @@ class UserModel extends CI_Model {
         $res = $this->db->query("SELECT user_id, phone_no, is_verified FROM users WHERE user_id = '".$id."' AND is_active = 1")->first_row();
         if (count($res) && $res->is_verified == 0) {
             $otp = rand(100000,999999);
-            $this->send_sms($otp, $res->phone_no);
+            $message = $otp . " otp to verify your number.";
+            $this->send_sms($message, $res->phone_no);
             $res->otp = $otp;
             $output = array('success' => true, 'message' => "Otp send successfully", 'data' => $res);
         } else {

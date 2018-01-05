@@ -16,6 +16,7 @@ class PlantModel extends CI_Model {
         $msg = checkParams($_POST,'local_name,category_id');
         unset($_POST['nurserys']);
         if (empty($msg)) {
+            $_POST = getSetData($_POST,'local_name,english_name,botanical_name,habit,family,watering,location,plant_use,extra_comment,category_id');
             $target_path = './assets/plants/'. $_POST['category_id'];
             if (!file_exists($target_path)) {
                 mkdir($target_path, 0777, true);
@@ -86,7 +87,7 @@ class PlantModel extends CI_Model {
         if(!empty($search)){$this->db->like("local_name",$search);}
         $this->db->select("t1.id,local_name,english_name,botanical_name,habit,family,watering,location,plant_use,extra_comment,image_url,t2.name as category,t1.is_active,t2.id as categoryid,group_concat(`nursery_id` separator ',') as nurserys");
         $this->db->join("plant_category as t2", "t2.id = t1.category_id");
-        $this->db->join("plant_nursery_link as t3","t1.id = t3.plant_id and t3.is_active = 1","left");
+        $this->db->join("plant_nursery_link as t3","t1.id = t3.plant_id","left");
         $this->db->group_by('t1.id');
         $output['data'] = $this->db->get('plant as t1')->result();
         if(!empty($search)){$this->db->like("local_name",$search);}
@@ -136,13 +137,13 @@ class PlantModel extends CI_Model {
 
     public function updatePlant($id='')
     {
-        $newnurserys = !empty($_GET['new']) ? explode(',', $_GET['new']) : '';
-        $oldnurserys = !empty($_GET['old']) ? explode(',', $_GET['old']) : '';
+        $nurserys = !empty($_GET['nurserys']) ? explode(',', $_GET['nurserys']) : '';
         unset($_POST['nurserys']);
         $data = array();
         $success = false;
         $msg = checkParams($_POST,'local_name,category_id');
         if (empty($msg)) {
+            $_POST = getSetData($_POST,'local_name,english_name,botanical_name,habit,family,watering,location,plant_use,extra_comment,category_id');
             $target_path = './assets/plants/'. $_POST['category_id'];
             if (!file_exists($target_path)) {
                 mkdir($target_path, 0777, true);
@@ -176,20 +177,14 @@ class PlantModel extends CI_Model {
                 }
             }
             if($success){
-                if(!empty($newnurserys)){
+                $this->db->where('plant_id',$id)->delete('plant_nursery_link');
+                if(!empty($nurserys)){
                     $data = array();
-                    for ($i=0; $i < count($newnurserys); $i++) { 
-                        $arr = array('plant_id' => $id, 'nursery_id' => $newnurserys[$i]);
+                    for ($i=0; $i < count($nurserys); $i++) { 
+                        $arr = array('plant_id' => $id, 'nursery_id' => $nurserys[$i]);
                         array_push($data, $arr);
                     }
                     $this->db->insert_batch("plant_nursery_link",$data);
-                }
-                if(!empty($oldnurserys)){
-                    $data = array();
-                    for ($i=0; $i < count($oldnurserys); $i++) { 
-                        $where = array('plant_id' => $id, 'nursery_id' => $oldnurserys[$i]);
-                        $this->db->where($where)->set(array('is_active' => 0))->update("plant_nursery_link");
-                    }
                 }
             }
         }

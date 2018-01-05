@@ -11,8 +11,9 @@ class CodeModel extends CI_Model {
 	public function add(){
         $data = array();
         $success = false;
-        $msg = checkParams($_POST); 
+        $msg = checkParams($_POST,'code,type,discount'); 
         if(empty($msg)){
+            $_POST = getSetData($_POST,'code,type,discount');
             $this->db->insert("codes",$_POST);
             if($this->db->insert_id()){
                 $success = true;
@@ -105,6 +106,7 @@ class CodeModel extends CI_Model {
         $success = false;
         $msg = checkParams($_POST);
         if (empty($msg)) {
+            $msg = checkParams($_POST,'code,type,discount'); 
             $this->db->where('id', $id);
             $count = $this->db->update("codes",$_POST);
             if($count){

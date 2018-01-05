@@ -6,26 +6,46 @@ class ArticlesModel extends CI_Model {
 	function __construct() {
 		parent::__construct();
 		$this->load->database();
+        $this->load->model('ExcelModel');
 	}
+
 	public function add(){
         $data = array();
         $success = false;
-        $msg = checkParams($_POST);
+        $msg = checkParams($_POST,"title,description");
         if ($msg === '') {
-
+            $_POST = getSetData($_POST,'title,description,image_url,video_url,image_type,video_type,url,source,designation');
             $target_path = './assets/articles/';
             if (!file_exists($target_path)) {
                 mkdir($target_path, 0777, true);
             }
-            if (isset($_FILES['image']['name'])) {
-    
-                $exp = explode(".", $_FILES['image']['name']);
-                $extension = end($exp);
-                $file_name = md5(''.time());
-                $target_path = $target_path . '/'. $file_name .'.'. $extension ;
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $target_path)) {
-        
-                    $_POST['image_url'] = '/assets/articles/'. $file_name. '.'.$extension;
+            if (count($_FILES) > 0) {
+                $count = 0;
+                if(isset($_FILES['image']['name']) && $_FILES['image']['name'] != '') {
+                    $exp = explode(".", $_FILES['image']['name']);
+                    $extension = end($exp);
+                    $file_name = md5(''.time());
+                    $target_path = $target_path . '/'. $file_name .'.'. $extension ;
+                    if (move_uploaded_file($_FILES['image']['tmp_name'], $target_path)) {
+                        $_POST['image_url'] = '/assets/articles/images/'. $file_name. '.'.$extension;
+                    } else {
+                        $count = 1;
+                        $msg = "Error in uploading Image, Try again.";
+                    }
+                }
+                if(isset($_FILES['video']['name']) && $_FILES['video']['name'] != '') {
+                    $exp = explode(".", $_FILES['video']['name']);
+                    $extension = end($exp);
+                    $file_name = md5(''.time());
+                    $target_path = $target_path . '/'. $file_name .'.'. $extension ;
+                    if (move_uploaded_file($_FILES['video']['tmp_name'], $target_path)) {
+                        $_POST['video_url'] = '/assets/articles/videos/'. $file_name. '.'.$extension;
+                    } else {
+                        $count = 1;
+                        $msg = "Error in uploading Video, Try again.";
+                    }
+                }
+                if($count === 0){
                     $this->db->insert("articles", $_POST);
                     if($this->db->insert_id()) {
                         $success = true;
@@ -33,12 +53,8 @@ class ArticlesModel extends CI_Model {
                     }else{
                         $msg = "Oops! error adding article.";
                     }
-                } else {
-        
-                    $msg = "Error in uploading file, Try again.";
                 }
             } else {
-    
                 $this->db->insert("articles",$_POST);
                 if($this->db->insert_id()){
                     $success = true;
@@ -84,10 +100,10 @@ class ArticlesModel extends CI_Model {
         );
         if($id>0){
             $this->db->where('a.user_id'->$id);
+            $this->db->where("a.is_active",1);
         }
         if(!empty($search)){$this->db->like("a.description",$search);}
-        $this->db->where("a.is_active",1);
-        $this->db->select('id,description,image_url,url,title,a.is_active,a.user_id,a.created_at,CONCAT(u.first_name, " ",u.last_name) as user_fullname,u.profile_pic as user_profile_pic');
+        $this->db->select('id,description,image_url,url,title,source,submitted_by,designation,video_url,image_type,video_type,a.is_active,a.user_id,a.created_at,CONCAT(u.first_name, " ",u.last_name) as user_fullname,u.profile_pic as user_profile_pic');
         $this->db->join('users as u','u.user_id = a.user_id', 'left');
         $output['data'] = $this->db->get('articles as a')->result();
         if(!empty($search)){$this->db->like("a.description",$search);}
@@ -122,6 +138,140 @@ class ArticlesModel extends CI_Model {
             $this->db->insert('upvotes',$_POST);
             $success = true;
             $msg = "Article upvoted successfully.";
+        }
+        echo json_encode(array("success" => $success,"msg" => $msg));
+        exit();
+    }
+
+    public function update($id=''){
+        $data = array();
+        $success = false;
+        $msg = checkParams($_POST,"title,description");
+        if ($msg === '') {
+            $_POST = getSetData($_POST,'title,description,image_url,video_url,image_type,video_type,url,source,designation');
+            $target_path = './assets/articles/';
+            if (!file_exists($target_path)) {
+                mkdir($target_path, 0777, true);
+            }
+            if (count($_FILES) > 0) {
+                $count = 0;
+                if(isset($_FILES['image']['name']) && $_FILES['image']['name'] != '') {
+                    $exp = explode(".", $_FILES['image']['name']);
+                    $extension = end($exp);
+                    $file_name = md5(''.time());
+                    $target_path = $target_path . '/'. $file_name .'.'. $extension ;
+                    if (move_uploaded_file($_FILES['image']['tmp_name'], $target_path)) {
+                        $_POST['image_url'] = '/assets/articles/images/'. $file_name. '.'.$extension;
+                    } else {
+                        $count = 1;
+                        $msg = "Error in uploading Image, Try again.";
+                    }
+                }
+                if(isset($_FILES['video']['name']) && $_FILES['video']['name'] != '') {
+                    $exp = explode(".", $_FILES['video']['name']);
+                    $extension = end($exp);
+                    $file_name = md5(''.time());
+                    $target_path = $target_path . '/'. $file_name .'.'. $extension ;
+                    if (move_uploaded_file($_FILES['video']['tmp_name'], $target_path)) {
+                        $_POST['video_url'] = '/assets/articles/videos/'. $file_name. '.'.$extension;
+                    } else {
+                        $count = 1;
+                        $msg = "Error in uploading Video, Try again.";
+                    }
+                }
+                if($count === 0){
+                    $this->db->where('id',$id);
+                    $count = $this->db->update("articles", $_POST);
+                    if($count > 0) {
+                        $success = true;
+                        $msg = "Article updated successfully.";
+                    }else{
+                        $msg = "Oops! error updating article.";
+                    }
+                }
+            } else {
+                $this->db->where('id',$id);
+                $count = $this->db->update("articles",$_POST);
+                if($count > 0){
+                    $success = true;
+                    $msg = "Article updated successfully.";
+                }else{
+                    $msg = "Oops! error updating article.";
+                }
+            }
+        } else {
+            $msg = 'Invalid Content';
+        }
+        echo json_encode(array("success" => $success,"msg" => $msg));
+        exit;
+    }
+
+    public function delete($id)
+    {
+        $success = false;
+        $msg = "";
+        $count = $this->db->where('id', $id)->set(array(
+            'is_active' => 0
+        ))->update("articles");
+        if($count > 0){
+            $success = true;
+            $msg = "Article deleted successfully.";
+        } else{
+            $msg = "Error deleting article,Try again.";
+        }
+        echo json_encode(array("success" => $success, "msg" => $msg));
+        exit();
+    }
+
+    public function recover($id)
+    {
+        $success = false;
+        $msg = "";
+        $count = $this->db->where('id', $id)->set(array(
+            'is_active' => 1
+        ))->update("articles");
+        if($count > 0){
+            $success = true;
+            $msg = "Article recovered successfully.";
+        } else{
+            $msg = "Error recovering article,Try again.";
+        }
+        echo json_encode(array("success" => $success, "msg" => $msg));
+        exit();
+    }
+
+    public function bulkUpload()
+    {
+        $success = false;
+        if($_FILES['excelFile']){
+            $result = $this->ExcelModel->parseExcel($_FILES['excelFile'],0);
+            if(count($result) > 1){
+                $finalObj = [];
+                for ($i=1; $i < count($result); $i++) { 
+                    $obj = array(
+                        'title' => isset($result[$i][0]) ? $result[$i][0] : '', 
+                        'description' => isset($result[$i][1]) ? $result[$i][1] : '',
+                        'image_url' => isset($result[$i][2]) ? $result[$i][2] : '',
+                        'video_url' => isset($result[$i][3]) ? $result[$i][3] : '',
+                        'url' => isset($result[$i][4]) ? $result[$i][4] : '', 
+                        'source' => isset($result[$i][5]) ? $result[$i][5] : '',
+                        'submitted_by' => isset($result[$i][6]) ? $result[$i][6] : '',
+                        'designation' => isset($result[$i][7]) ? $result[$i][7] : '',
+                    );
+                    $finalObj[] = $obj;
+                }
+                $count = $this->db->insert_batch('articles',$finalObj);
+                if($count > 0){
+                    $success = true;
+                    $msg = count($finalObj)." records added successfully.";
+                } else {
+                    $msg = 'Error inserting records, Try again.';
+                }
+            } else {
+                $msg = "No records found";
+            }
+        }else{
+            $msg = 'File not found.';
         }
         echo json_encode(array("success" => $success,"msg" => $msg));
         exit();
