@@ -20,7 +20,10 @@
                     <div class="col-md-12">
                       <button type="button" onclick="AddTheRow()" class="btn btn-info" data-toggle="modal" data-target="#modal-default" >
                         <span class="glyphicon glyphicon-plus"></span> Add New Nursery
-                      </button>
+                      </button><a href="<?php echo site_url('nurserybanners/list'); ?>">
+                      <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-default">
+                         Banners
+                      </button></a>
                       <button type="button" onclick="BulkUpload()" class="btn btn-info pull-right" data-toggle="modal" data-target="#modal-default">
                         <span class="glyphicon glyphicon-file"></span> Import File
                       </button>
@@ -36,6 +39,7 @@
                             <th>Address</th>
                             <th>Latitude</th>
                             <th>Longitude</th>
+                            <th>Owner Name</th>
                             <th>Image</th>
                             <th>Action</th>
                           </tr>
@@ -98,6 +102,12 @@
                               </div>
                           </div>
                           <div class="row form-group">
+                              <label class="col-md-3 text-right"> Owner Name : </label>
+                              <div class="col-md-9">
+                                  <input type="text" class="form-control owner_name" name="owner_name">
+                              </div>
+                          </div>
+                          <div class="row form-group">
                               <label class="col-md-3 text-right"> Plant Categories : </label>
                               <div class="col-md-9">
                                   <select class="form-control plant_categories col-md-9" name='plant_categories' multiple="multiple">
@@ -115,6 +125,12 @@
                               <label class="col-md-3 text-right"> Image : </label>
                               <div class="col-md-9">
                                   <input id="input-b1" name="image" type="file" class="file">
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-3 text-right"></label>
+                              <div class="col-md-9">
+                                  <label class="checkbox-inline"><input type="checkbox" class="is_member" name="is_member">ReGreen Member ?</label>
                               </div>
                           </div>
                       </div>
@@ -177,6 +193,12 @@
                               </div>
                           </div>
                           <div class="row form-group">
+                              <label class="col-md-3 text-right"> Owner Name : </label>
+                              <div class="col-md-9">
+                                  <input type="text" class="form-control owner_name" name="owner_name">
+                              </div>
+                          </div>
+                          <div class="row form-group">
                               <label class="col-md-3 text-right"> Plant Categories : </label>
                               <div class="col-md-9">
                                   <select class="form-control plant_categories col-md-9" name='plant_categories' multiple="multiple">
@@ -200,6 +222,12 @@
                               <label class="col-md-3 text-right"></label>
                               <div class="col-md-9">
                                   <img style='height:50px; widht:50px;' name='eimage' />
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-3 text-right"></label>
+                              <div class="col-md-9">
+                                  <label class="checkbox-inline"><input type="checkbox" class="is_member" name="is_member">ReGreen Member ?</label>
                               </div>
                           </div>
                       </div>
@@ -366,6 +394,14 @@
                 "bSortable": false
               },
               {
+                "data": "owner_name", 
+                "bSortable": false
+              },
+              {
+                "data": null, 
+                "bSortable": false
+              },
+              {
                 "data": null, 
                 "bSortable": false
               },
@@ -385,22 +421,16 @@
               } else {
                 base_url = "<?php echo base_url('assets/no-image.jpg'); ?>";
               }
-              $('td:eq(5)',nRow).html(""
+              $('td:eq(7)',nRow).html(""
                   +"<img style='height:50px; widht:50px;' src='"+base_url+"'/>"
               +"");
+              if(aData.is_member == "1") {
+                $('td:eq(6)',nRow).html("Yes");
+              } else {
+                $('td:eq(6)',nRow).html("No");
+              }
               if(aData.is_active==1){
-                  // if(aData.id==userid){
-                  //     $('td:eq(5)',nRow).html(""
-                  //         +"<button class='btn btn-info' onclick='return EditTheRow("+iDisplayindex+","+aData.id+");'>"
-                  //         +"<i class='fa fa-edit'></i>"
-                  //         +"</button>"
-                  //         +"<button class='btn btn-danger' disabled>"
-                  //         +"<i class='fa fa-trash-o'></i>"
-                  //         +"</button>"
-                  //     +"");
-                  // }
-                  // else{
-                      $('td:eq(6)',nRow).html(""
+                      $('td:eq(8)',nRow).html(""
                           +"<button class='btn btn-info' onclick='return EditTheRow("+iDisplayindex+","+aData.id+");'>"
                           +"<i class='fa fa-edit'></i>"
                           +"</button>"
@@ -412,7 +442,7 @@
 
               }else{
                   $(nRow).addClass('danger');
-                  $('td:eq(6)',nRow).html(""
+                  $('td:eq(8)',nRow).html(""
                       +"<button class='btn btn-info' disabled onclick='return EditTheRow("+iDisplayindex+","+aData.id+");'>"
                       +"<i class='fa fa-edit'></i>"
                       +"</button>"
@@ -441,6 +471,7 @@
       $("#editNurseryModal").find("[name=address]").attr("value",data[index].address);
       $("#editNurseryModal").find("[name=longitude]").attr("value",data[index].longitude);
       $("#editNurseryModal").find("[name=latitude]").attr("value",data[index].latitude);
+      $("#editNurseryModal").find("[name=owner_name]").attr("value",data[index].owner_name);
       base_url = "<?php echo base_url(); ?>"+data[index].image_url;
       $("#editNurseryModal").find("[name=eimage]").attr("src",base_url);
       id = aid;
@@ -586,6 +617,9 @@
         },
         longitude: {
           number: true
+        },
+        owner_name: {
+          required: true
         }
       },
       submitHandler: function(form) {
@@ -608,6 +642,9 @@
         },
         longitude: {
           number: true
+        },
+        owner_name: {
+          required: true
         }
       },
       submitHandler: function(form) {

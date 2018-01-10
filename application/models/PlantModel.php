@@ -274,4 +274,60 @@ class PlantModel extends CI_Model {
         echo json_encode(array("success" => $success,"msg" => $msg));
         exit();
     }
+
+    public function getPlantsForApp()
+    {
+        $search = array('value' => '');
+        if (isset($_POST['search'])) {
+            $search = $_POST['search'];
+        }
+        if (isset($search['value'])) {
+            $search = $search['value'];
+        }
+        $start = 0;
+        if (isset($_POST['start'])) {
+            $start = $_POST['start'];
+        }
+        $length = 10;
+        if (isset($_POST['length'])) {
+            $length = $_POST['length'];
+        }
+        $draw = 1;
+        if (isset($_POST['draw'])) {
+            $draw = $_POST['draw'];
+        }
+        $output = array("code" => 1,
+            'draw' => $draw,
+            'recordsTotal' => 0,
+            'recordsFiltered' => 0,
+            'search' => $search,
+            'success' => true,
+            'msg' => 'Data fetched successfully.',
+            'data' => []
+        );
+        if(isset($_POST['category_id']) && $_POST['category_id'] != ''){
+            $this->db->limit($length,$start);
+            $this->db->where('category_id',$_POST['category_id']);
+            $output['data'] = $this->db->select('id,local_name,english_name,botanical_name,habit,family,watering,location,plant_use,extra_comment,image_url')->get('plant')->result();
+        }
+        if(isset($_POST['nursery_id']) && $_POST['nursery_id'] != ''){
+            $this->db->limit($length,$start);
+            $this->db->where('t3.nursery_id',$_POST['nursery_id']);
+            $this->db->select("t1.id,local_name,english_name,botanical_name,habit,family,watering,location,plant_use,extra_comment,image_url,t2.name as category,t1.is_active,t2.id as categoryid");
+            $this->db->join("plant_category as t2", "t2.id = t1.category_id");
+            $this->db->join("plant_nursery_link as t3","t1.id = t3.plant_id","left");
+            $this->db->group_by('t1.id');
+            $output['data'] = $this->db->get('plant as t1')->result();
+        }
+        if(isset($_POST['category_id']) && isset($_POST['nursery_id']) && $_POST['nursery_id'] != '' && $_POST['category_id'] !=''){
+            $output['data'] = $this->db->query("SELECT distinct p.id,local_name,english_name,botanical_name,habit,family,watering,location,plant_use,extra_comment,image_url FROM plant AS p JOIN plant_nursery_link AS pn ON pn.plant_id = p.id JOIN nursery_plant_category_link AS npcl ON npcl.nursery_id = pn.nursery_id WHERE p.category_id = '".$_POST['category_id']."' AND pn.nursery_id = '".$_POST['nursery_id']."' GROUP BY p.id LIMIT ".$start.", ".$length."")->result();
+        }
+        $output['recordsFiltered']=count($output['data']);
+        $output['recordsTotal']=$this->db->get('plant as p')->num_rows();
+        if (!empty($output['data'])) {
+            $output['code'] = 1;
+        }
+        echo json_encode($output);
+        exit;
+    }
 }

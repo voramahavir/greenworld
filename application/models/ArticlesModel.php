@@ -91,29 +91,39 @@ class ArticlesModel extends CI_Model {
         if (isset($_POST['draw'])) {
             $draw = $_POST['draw'];
         }
-
+        $this->db->limit($length,$start);
         $output = array("code" => 0,
             'draw' => $draw,
             'recordsTotal' => 0,
             'recordsFiltered' => 0,
-            'search' => $search
+            'search' => $search,
+            'success' => true,
+            'msg' => 'Data fetched successfully.'
         );
-        if($id>0){
-            $this->db->where('a.user_id'->$id);
-            $this->db->where("a.is_active",1);
-        }
+        // if($id>0){
+        //     $this->db->where('a.user_id'->$id);
+        //     $this->db->where("a.is_active",1);
+        // }
         if(!empty($search)){$this->db->like("a.description",$search);}
         $this->db->select('id,description,image_url,url,title,source,submitted_by,designation,video_url,image_type,video_type,a.is_active,a.user_id,a.created_at,CONCAT(u.first_name, " ",u.last_name) as user_fullname,u.profile_pic as user_profile_pic');
         $this->db->join('users as u','u.user_id = a.user_id', 'left');
         $output['data'] = $this->db->get('articles as a')->result();
         if(!empty($search)){$this->db->like("a.description",$search);}
-        if($id>0){
-            $this->db->where('a.user_id'->$id);
-        }
+        // if($id>0){
+        //     $this->db->where('a.user_id'->$id);
+        // }
         $output['recordsTotal']=$this->db->get('articles as a')->num_rows();
         $output['recordsFiltered']=$output['recordsTotal'];
+        $output['reward_points'] = 0;
         if (!empty($output['data'])) {
             $output['code'] = 1;
+        }
+
+        if($id>0){
+            $res = $this->db->select('reward_points')->where('user_id',$id)->get('users')->first_row();
+            if(isset($res->reward_points)){
+                $output['reward_points'] = $res->reward_points;
+            }
         }
         echo json_encode($output);
         exit;

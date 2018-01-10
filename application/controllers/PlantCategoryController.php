@@ -42,4 +42,9 @@ class PlantCategoryController extends CI_Controller {
 		$this->load->model('PlantCategoryModel');
 		$this->PlantCategoryModel->updatePlantCategory($id);
 	}
+
+	public function getCategories($id='') {
+		$this->load->model('PlantCategoryModel');
+		$this->PlantCategoryModel->getCategories($id);
+	}
 }

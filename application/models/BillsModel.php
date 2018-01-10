@@ -8,7 +8,6 @@ class BillsModel extends CI_Model {
 		$this->load->database();
 	}
 	public function add(){
-        custom_log('addBill',json_encode($_POST));
         $data = array();
         $success = false;
         $msg = checkParams($_POST);
@@ -17,37 +16,37 @@ class BillsModel extends CI_Model {
             $res = $this->db->get('users')->result();
             if(count($res) > 0){
                 $_POST = getSetData($_POST,'user_id,amount,nurname');
-                $this->db->where('user_id',$_POST['user_id']);
-                $res = $this->db->get('bills')->result();
-                if(count($res) > 0){
-                    $msg = "User has already requested for it.";
-                } else{
+                // $this->db->where('user_id',$_POST['user_id']);
+                // $res = $this->db->get('bills')->result();
+                // if(count($res) > 0){
+                //     $msg = "User has already requested for it.";
+                // } else{
 
-                    $target_path = './assets/bills/';
-                    if (!file_exists($target_path)) {
-                        mkdir($target_path, 0777, true);
-                    }
-                    if (isset($_FILES['image']['name']) $_FILES['image']['name'] != '') {
-                        $exp = explode(".", $_FILES['image']['name']);
-                        $extension = end($exp);
-                        $file_name = md5(''.time());
-                        $target_path = $target_path . '/'. $file_name .'.'. $extension ;
-                        if (move_uploaded_file($_FILES['image']['tmp_name'], $target_path)) {
-                            $_POST['image_url'] = '/assets/bills/'. $file_name. '.'.$extension;
-                            $this->db->insert("bills",$_POST);
-                            if($this->db->insert_id()){
-                                $success = true;
-                                $msg = "Bill added successfully.";
-                            }else{
-                                $msg = "Oops! error adding bill.";
-                            }
-                        } else {
-                            $msg = "Error in uploading file, Try again.";
+                $target_path = './assets/bills/';
+                if (!file_exists($target_path)) {
+                    mkdir($target_path, 0777, true);
+                }
+                if (isset($_FILES['image']['name']) && $_FILES['image']['name'] != '') {
+                    $exp = explode(".", $_FILES['image']['name']);
+                    $extension = end($exp);
+                    $file_name = md5(''.time());
+                    $target_path = $target_path . '/'. $file_name .'.'. $extension ;
+                    if (move_uploaded_file($_FILES['image']['tmp_name'], $target_path)) {
+                        $_POST['image_url'] = '/assets/bills/'. $file_name. '.'.$extension;
+                        $this->db->insert("bills",$_POST);
+                        if($this->db->insert_id()){
+                            $success = true;
+                            $msg = "Bill added successfully.";
+                        }else{
+                            $msg = "Oops! error adding bill.";
                         }
                     } else {
-                        $msg = "File is missing.";
+                        $msg = "Error in uploading file, Try again.";
                     }
+                } else {
+                    $msg = "File is missing.";
                 }
+                // }
             } else {
                 $msg = "User does not exist.";
             }
@@ -59,6 +58,7 @@ class BillsModel extends CI_Model {
     public function get($id='')
     {
         $search = array('value' => '');
+        $reward_points = 0;
         if (isset($_POST['search'])) {
             $search = $_POST['search'];
         }
@@ -77,14 +77,22 @@ class BillsModel extends CI_Model {
         if (isset($_POST['draw'])) {
             $draw = $_POST['draw'];
         }
-
+        $this->db->limit($length,$start);
         $output = array("code" => 0,
             'draw' => $draw,
             'recordsTotal' => 0,
             'recordsFiltered' => 0,
-            'search' => $search
+            'search' => $search,
+            'success' => true,
+            'msg' => 'Data fetched successfully.'
         );
-        if($id != ''){$this->db->where(array('b.user_id' => $id, 'is_confirm' => 2));}
+        if($id != ''){
+            $res = $this->db->select('reward_points')->where('user_id',$id)->get('users')->first_row();
+            if(isset($res->reward_points)){
+                $reward_points = $res->reward_points;
+            }
+            $this->db->where(array('b.user_id' => $id, 'is_confirm' => 2));
+        }
         if(!empty($search)){$this->db->like("amount",$search);}
         $this->db->select('id,image_url,amount,nurname,is_confirm,CONCAT(u.first_name, " ",u.last_name) as user_fullname');
         $this->db->join('users as u','u.user_id = b.user_id');
@@ -93,6 +101,7 @@ class BillsModel extends CI_Model {
         if(!empty($search)){$this->db->like("amount",$search);}
         $output['recordsTotal']=$this->db->get('bills')->num_rows();
         $output['recordsFiltered']=$output['recordsTotal'];
+        $output['reward_points'] = $reward_points;
         if (!empty($output['data'])) {
             $output['code'] = 1;
         }

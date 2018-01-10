@@ -46,4 +46,8 @@ class PlantController extends CI_Controller {
 	public function import() {
 		$this->PlantModel->bulkUpload();
 	}
+
+	public function getPlants() {
+		$this->PlantModel->getPlantsForApp();
+	}
 }

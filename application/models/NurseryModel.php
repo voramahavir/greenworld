@@ -17,7 +17,12 @@ class NurseryModel extends CI_Model {
         unset($_POST['plant']);
         unset($_POST['plant_categories']);
         if (empty($msg)) {
-            $_POST = getSetData($_POST,'name,contact_no,address,latitude,longitude');
+            $_POST = getSetData($_POST,'name,contact_no,address,latitude,longitude,owner_name,is_member');
+            if($_POST['is_member'] == 'on'){
+                $_POST['is_member'] = 1;
+            } else {
+                $_POST['is_member'] = 0;
+            }
             $target_path = './assets/nursery/';
             if (!file_exists($target_path)) {
                 mkdir($target_path, 0777, true);
@@ -77,7 +82,7 @@ class NurseryModel extends CI_Model {
         if (isset($_POST['start'])) {
             $start = $_POST['start'];
         }
-        $length = 10;
+        $length = 5;
         if (isset($_POST['length'])) {
             $length = $_POST['length'];
         }
@@ -85,15 +90,17 @@ class NurseryModel extends CI_Model {
         if (isset($_POST['draw'])) {
             $draw = $_POST['draw'];
         }
-
+        $this->db->limit($length,$start);
         $output = array("code" => 0,
             'draw' => $draw,
             'recordsTotal' => 0,
             'recordsFiltered' => 0,
-            'search' => $search
+            'search' => $search,
+            'success' => true,
+            'msg' => 'Data fetched successfully.'
         );
         if(!empty($search)){$this->db->like("name",$search);}
-        $output['data'] = $this->db->query("SELECT A.id,name,contact_no,address,image_url,A.is_active,latitude,longitude,group_concat(`plant_id` separator ',') as plants, group_concat(`category_id` separator ',') as plant_categories from nursery as A left join plant_nursery_link as B on A.id = B.nursery_id left join nursery_plant_category_link as C on A.id = C.nursery_id GROUP BY A.id")->result();
+        $output['data'] = $this->db->query("SELECT A.id,name,contact_no,address,image_url,owner_name,is_member,A.is_active,latitude,longitude,group_concat(`plant_id` separator ',') as plants, group_concat(`category_id` separator ',') as plant_categories from nursery as A left join plant_nursery_link as B on A.id = B.nursery_id left join nursery_plant_category_link as C on A.id = C.nursery_id GROUP BY A.id")->result();
         if(!empty($search)){$this->db->like("name",$search);}
         $output['recordsTotal']=$this->db->get('nursery')->num_rows();
         $output['recordsFiltered']=$output['recordsTotal'];
@@ -148,7 +155,12 @@ class NurseryModel extends CI_Model {
         $success = false;
         $msg = checkParams($_POST,'name,contact_no');
         if (empty($msg)) {
-            $_POST = getSetData($_POST,'name,contact_no,address,latitude,longitude');
+            $_POST = getSetData($_POST,'name,contact_no,address,latitude,longitude,owner_name,is_member');
+            if($_POST['is_member'] == 'on'){
+                $_POST['is_member'] = 1;
+            } else {
+                $_POST['is_member'] = 0;
+            }
             $target_path = './assets/nursery/';
             if (!file_exists($target_path)) {
                 mkdir($target_path, 0777, true);
@@ -214,14 +226,19 @@ class NurseryModel extends CI_Model {
             if(count($result) > 1){
                 $finalObj = [];
                 for ($i=1; $i < count($result); $i++) { 
+                    $is_member = 0;
+                    if(isset($result[$i][6]) && $result[$i][6] == 'Yes'){
+                        $is_member = 1;
+                    }
                     $obj = array(
                         'name' => isset($result[$i][0]) ? $result[$i][0] : '' , 
                         'contact_no' => isset($result[$i][1]) ? $result[$i][1] : '' ,
                         'address' => isset($result[$i][2]) ? $result[$i][2] : '' ,
                         'latitude' => isset($result[$i][3]) ? $result[$i][3] : '' ,
-                        'longitude' => isset($result[$i][4]) ? $result[$i][4] : '' 
+                        'longitude' => isset($result[$i][4]) ? $result[$i][4] : '',
+                        'owner_name' => isset($result[$i][5]) ? $result[$i][5] : '',
+                        'is_member' => $is_member
                     );
-
                     if (isset($result[$i][0]) && $result[$i][0]) {
                         $finalObj[] = $obj;
                     }
@@ -245,12 +262,20 @@ class NurseryModel extends CI_Model {
 
     public function nearByNursery() {
         $success = false;
-        $msg = checkParams($_POST);
+        $msg = checkParams($_POST,"latitude,longitude");
         $res = array();
+        $start = 0;
+        if (isset($_POST['start'])) {
+            $start = $_POST['start'];
+        }
+        $length = 10;
+        if (isset($_POST['length'])) {
+            $length = $_POST['length'];
+        }
         if(empty($msg)){
             $lat = $_POST['latitude'];
             $long = $_POST['longitude'];
-            $res = $this->db->query("SELECT * , (3956 * 2 * ASIN(SQRT( POWER(SIN(( '".$lat."' - latitude) *  pi()/180 / 2), 2) +COS( '".$lat."' * pi()/180) * COS(latitude * pi()/180) * POWER(SIN(( '".$long."' - longitude) * pi()/180 / 2), 2) ))) as distance from nursery having  distance <= 10 order by distance")->result();
+            $res = $this->db->query("SELECT * , (3956 * 2 * ASIN(SQRT( POWER(SIN(( '".$lat."' - latitude) *  pi()/180 / 2), 2) +COS( '".$lat."' * pi()/180) * COS(latitude * pi()/180) * POWER(SIN(( '".$long."' - longitude) * pi()/180 / 2), 2) ))) as distance from nursery having  distance <= 10 order by distance LIMIT ".$start.", ".$length."")->result();
             $success = true;
         }
         echo json_encode(array("success" => $success,"msg" => $msg,"data" => $res));

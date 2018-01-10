@@ -31,6 +31,7 @@
                             <th>Code</th>
                             <th>Type</th>
                             <th>Discount</th>
+                            <th>Reusability</th>
                             <th>Action</th>
                           </tr>
                         </thead>
@@ -68,9 +69,10 @@
                               <label class="col-md-3 text-right"> Type : </label>
                               <div class="col-md-9">
                                   <select class="form-control select type" name='type'>
-                                      <option value="0">Select Type</option>
+                                      <option value="">Select Type</option>
                                       <option value="1">Amount</option>
                                       <option value="2">Percentage</option>
+                                      <option value="3">Gift</option>
                                   </select>
                               </div>
                           </div>
@@ -78,6 +80,16 @@
                               <label class="col-md-3 text-right"> Discount  : </label>
                               <div class="col-md-9">
                                   <input type="text" class="form-control discount" name="discount">
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-3 text-right"> Reusability : </label>
+                              <div class="col-md-9">
+                                  <select class="form-control select reusability" name='reusability'>
+                                      <option value="">Select Reusability</option>
+                                      <option value="1">One Time</option>
+                                      <option value="2">More than one time</option>
+                                  </select>
                               </div>
                           </div>
                       </div>
@@ -116,9 +128,10 @@
                               <label class="col-md-3 text-right"> Type : </label>
                               <div class="col-md-9">
                                   <select class="form-control select type" name='type'>
-                                      <option value="0">Select Type</option>
+                                      <option value="">Select Type</option>
                                       <option value="1">Amount</option>
                                       <option value="2">Percentage</option>
+                                      <option value="3">Gift</option>
                                   </select>
                               </div>
                           </div>
@@ -126,6 +139,16 @@
                               <label class="col-md-3 text-right"> Discount  : </label>
                               <div class="col-md-9">
                                   <input type="text" class="form-control discount" name="discount">
+                              </div>
+                          </div>
+                          <div class="row form-group">
+                              <label class="col-md-3 text-right"> Reusability : </label>
+                              <div class="col-md-9">
+                                  <select class="form-control select reusability" name='reusability'>
+                                      <option value="">Select Reusability</option>
+                                      <option value="1">One Time</option>
+                                      <option value="2">More than one time</option>
+                                  </select>
                               </div>
                           </div>
                       </div>
@@ -213,6 +236,10 @@
                 "bSortable": false
               },
               {
+                "data": "reusability", 
+                "bSortable": false
+              },
+              {
                 "data": null, 
                 "bSortable": false
               }
@@ -225,11 +252,18 @@
               userid = 1;
               if(aData.type == "1") {
                 $('td:eq(1)',nRow).html("Amount");
-              } else {
+              } else if(aData.type == "2") {
                 $('td:eq(1)',nRow).html("Discount");
+              } else {
+                $('td:eq(1)',nRow).html("Gift");
+              }
+              if(aData.reusability == "1") {
+                $('td:eq(3)',nRow).html("One Time");
+              } else {
+                $('td:eq(3)',nRow).html("More than one time");
               }
               if(aData.is_active==1){
-                  $('td:eq(3)',nRow).html(""
+                  $('td:eq(4)',nRow).html(""
                       +"<button class='btn btn-info' onclick='return EditTheRow("+iDisplayindex+","+aData.id+");'>"
                       +"<i class='fa fa-edit'></i>"
                       +"</button>"
@@ -239,7 +273,7 @@
                   +"");
               }else{
                   $(nRow).addClass('danger');
-                  $('td:eq(3)',nRow).html(""
+                  $('td:eq(4)',nRow).html(""
                       +"<button class='btn btn-info' disabled onclick='return EditTheRow("+iDisplayindex+","+aData.id+");'>"
                       +"<i class='fa fa-edit'></i>"
                       +"</button>"
@@ -265,12 +299,14 @@
       $("#editCodeModal").find("[name=code]").attr("value",data[index].code);
       $("#editCodeModal").find("[name=type]").val(data[index].type);
       $("#editCodeModal").find("[name=discount]").attr("value",data[index].discount);
+      $("#editCodeModal").find("[name=reusability]").val(data[index].reusability);
     }
     function AddTheRow(){
       $("#addCodeModal").modal("show");
       $("#addCodeModal").find("[name=code]").attr("value","");
       $("#addCodeModal").find("[name=type]").val("0");
       $("#addCodeModal").find("[name=discount]").attr("value","");
+      $("#addCodeModal").find("[name=reusability]").attr("value","");
     }
     $(".deleteCode").on("click",function(){
         $(".deleteCode").prop("disabled",true);
@@ -302,10 +338,16 @@
     });
     $("#addCode").validate({
       rules: {
-        name: {
+        code: {
           required: true
         },
         type: {
+          required: true
+        },
+        discount: {
+          required: true
+        },
+        reusability: {
           required: true
         }
       },
@@ -315,10 +357,16 @@
     });
     $("#editCode").validate({
       rules: {
-        name: {
+        code: {
           required: true
         },
         type: {
+          required: true
+        },
+        discount: {
+          required: true
+        },
+        reusability: {
           required: true
         }
       },

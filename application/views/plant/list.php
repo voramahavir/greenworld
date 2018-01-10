@@ -20,7 +20,10 @@
                     <div class="col-md-12">
                       <button type="button" onclick="AddTheRow()" class="btn btn-info" data-toggle="modal" data-target="#modal-default">
                         <span class="glyphicon glyphicon-plus"></span> Add New Plant
-                      </button>
+                      </button><a href="<?php echo site_url('plantbanners/list'); ?>">
+                      <button type="button" class="btn btn-info" data-toggle="modal" data-target="#modal-default">
+                         Banners
+                      </button></a>
                       <button type="button" onclick="BulkUpload()" class="btn btn-info pull-right" data-toggle="modal" data-target="#modal-default">
                         <span class="glyphicon glyphicon-file"></span> Import File
                       </button>

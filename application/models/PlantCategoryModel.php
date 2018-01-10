@@ -119,4 +119,45 @@ class PlantCategoryModel extends CI_Model {
         echo json_encode(array("success" => $success,"msg" => $msg));
         exit();
     }
+
+    public function getCategories($id='')
+    {
+        $search = array('value' => '');
+        if (isset($_POST['search'])) {
+            $search = $_POST['search'];
+        }
+        if (isset($search['value'])) {
+            $search = $search['value'];
+        }
+        $start = 0;
+        if (isset($_POST['start'])) {
+            $start = $_POST['start'];
+        }
+        $length = 10;
+        if (isset($_POST['length'])) {
+            $length = $_POST['length'];
+        }
+        $draw = 1;
+        if (isset($_POST['draw'])) {
+            $draw = $_POST['draw'];
+        }
+
+        $output = array("code" => 0,
+            'draw' => $draw,
+            'recordsTotal' => 0,
+            'recordsFiltered' => 0,
+            'search' => $search
+        );
+        $this->db->select('id as category_id,name as category_name');
+        $this->db->where('nursery_id',$id);
+        $this->db->join('plant_category as p','p.id = l.category_id and p.is_active = 1','left');
+        $output['data'] = $this->db->get('nursery_plant_category_link as l')->result();
+        $output['recordsTotal']=$this->db->get('nursery_plant_category_link as l')->num_rows();
+        $output['recordsFiltered']=$output['recordsTotal'];
+        if (!empty($output['data'])) {
+            $output['code'] = 1;
+        }
+        echo json_encode($output);
+        exit;
+    }
 }
