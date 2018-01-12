@@ -62,7 +62,7 @@
                 <input type="hidden" name="status" value="">
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-danger margin-0">No</button>
+                <button type="button" class="btn btn-danger margin-0" data-dismiss="modal">No</button>
                 <button type="button" class="btn btn-success" onclick="ajaxCall()">Yes</button>
               </div>
             </div>

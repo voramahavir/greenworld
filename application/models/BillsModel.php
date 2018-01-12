@@ -77,7 +77,6 @@ class BillsModel extends CI_Model {
         if (isset($_POST['draw'])) {
             $draw = $_POST['draw'];
         }
-        $this->db->limit($length,$start);
         $output = array("code" => 0,
             'draw' => $draw,
             'recordsTotal' => 0,
@@ -92,6 +91,7 @@ class BillsModel extends CI_Model {
                 $reward_points = $res->reward_points;
             }
             $this->db->where(array('b.user_id' => $id, 'is_confirm' => 2));
+        	$this->db->limit($length,$start);
         }
         if(!empty($search)){$this->db->like("amount",$search);}
         $this->db->select('id,image_url,amount,nurname,is_confirm,CONCAT(u.first_name, " ",u.last_name) as user_fullname');
