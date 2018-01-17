@@ -6,7 +6,8 @@ class BillsModel extends CI_Model {
 	function __construct() {
 		parent::__construct();
 		$this->load->database();
-	}
+    }
+
 	public function add(){
         $data = array();
         $success = false;
@@ -118,7 +119,7 @@ class BillsModel extends CI_Model {
             'is_confirm' => $value,
             'nurname' => $_POST['nurname']
         ))->update("bills");
-        if($count > 0){
+        if($count > 0) {
             if($value == 2) {
                 $this->db->where('id',$id);
                 $res = $this->db->get('bills')->first_row();

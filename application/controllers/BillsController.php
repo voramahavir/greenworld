@@ -15,7 +15,7 @@ class BillsController extends CI_Controller {
 		// $this->load->view('login');
 	}
 
-	public function list(){
+	public function list() {
 		$this->load->view('bills/list');
 	}
 

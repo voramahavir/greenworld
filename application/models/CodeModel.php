@@ -137,7 +137,7 @@ class CodeModel extends CI_Model {
                 if($codeDetails[0]->type == 1 ){
                     $reward_points = $userDetails->reward_points - $codeDetails[0]->discount;
                 } else {
-                    $reward_points = ($userDetails->reward_points * $codeDetails[0]->discount) / 100;
+                    $reward_points = $userDetails->reward_points - [($userDetails->reward_points * $codeDetails[0]->discount) / 100];
                 }
                 if($codeDetails[0]->reusability == 1){
                     $this->db->where('code_id', $codeDetails[0]->id);
