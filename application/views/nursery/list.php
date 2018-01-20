@@ -363,6 +363,7 @@
         table = $('#table_nursery').DataTable({
           "paging": true,
           "lengthChange": true,
+          "scrollX": true,
           "searching": true,
           "ordering": true,
           "responsive": true,

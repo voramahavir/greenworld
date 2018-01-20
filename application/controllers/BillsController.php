@@ -30,4 +30,12 @@ class BillsController extends CI_Controller {
 	public function confirm($id=""){
 		$this->BillsModel->confirm($id);
 	}
+
+	public function getMessages() {
+		$this->BillsModel->getMessages();
+	}
+
+	public function sendMessage($id='') {
+		$this->BillsModel->sendMessage($id);
+	}
 }

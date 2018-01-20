@@ -39,36 +39,6 @@
           </div>
         </div>
       </div>
-      <!-- RecoverModal -->
-      <div class="modal fade modal-3d-flip-horizontal" id="confirmModal" aria-hidden="true" aria-labelledby="exampleModalTitle" role="dialog" tabindex="-1">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">×</span>
-                </button>
-                <h4 class="modal-title">Are you sure you want to do this ?</h4>
-              </div>
-              <div class="modal-body">
-                    <div class="row form-group">
-                        <label class="col-md-3 text-right"> Nursery : </label>
-                        <div class="col-md-9">
-                            <select class="form-control select nurname" name='nurname'>
-                                <option value="0">Select Nursery</option>
-                            </select>
-                        </div>
-                    </div>
-                <input type="hidden" name="id" value="">
-                <input type="hidden" name="status" value="">
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-danger margin-0" data-dismiss="modal">No</button>
-                <button type="button" class="btn btn-success" onclick="ajaxCall()">Yes</button>
-              </div>
-            </div>
-          </div>
-      </div>
-      <!-- End RecoverModal -->
       <!-- UpdateModal -->
       <div class="modal fade modal-3d-flip-horizontal" id="fullImageModal" aria-hidden="true" aria-labelledby="exampleModalTitle" role="dialog" tabindex="-1">
           <div class="modal-dialog">
@@ -80,17 +50,34 @@
                   </button>
                 </div>
                 <div class="modal-body">
-                    <div class="row" style='margin-right: 0px !important; margin-left: 20px !important;'>
-                      <div class="col-md-9">
+                    <div class="row">
+                      <div class="col-md-offset-2 col-md-9">
                           <div class="row form-group">
-                              <div class="col-md-12">
-                                  <img style='height:500px; width:500px;' name='image' />
+                              <div class=" col-md-8">
+                                  <img style='height:300px; width:350px;' name='image' />
                               </div>
                           </div>
                       </div>
                     </div>
+                    <div class="row form-group">
+                        <label class="col-md-offset-2 col-md-2"> Amount : </label>
+                        <div class="col-md-5">
+                            <p class="amount" name='amount'>0</p>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-md-offset-2 col-md-2"> Nursery : </label>
+                        <div class="col-md-5">
+                            <select class="form-control select nurname" name='nurname'>
+                                <option value="0">Select Nursery</option>
+                            </select>
+                        </div>
+                    </div>
+                <input type="hidden" name="id" value="">
                 </div>
                 <div class="modal-footer">
+                  <button type="button" class="btn btn-danger margin-0" name="confirm" onclick="message()">Cancel</button>
+                  <button type="button" class="btn btn-success" name="cancel" onclick="ajaxCall(2)">Confirm</button>
                 </div>
               </form>
               <div class="overlay">
@@ -100,6 +87,40 @@
           </div>
       </div>
       <!-- End UpdateModal -->
+      <!-- MessageModel -->
+      <div class="modal fade modal-3d-flip-horizontal" id="messageModal" aria-hidden="true" aria-labelledby="exampleModalTitle" role="dialog" tabindex="-1">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                    <div class="row form-group">
+                        <label class="col-md-3 text-right"> Message : </label>
+                        <div class="col-md-9">
+                            <select class="form-control select message" name='message'>
+                                <option value="0">Select Message</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row form-group customMessage">
+                        <label class="col-md-3 text-right"> Write Message : </label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control custom" name="custom">
+                        </div>
+                    </div>
+                <input type="hidden" name="id" value="">
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger margin-0" data-dismiss="modal">No</button>
+                <button type="button" class="btn btn-success" onclick="sendMessage()">Yes</button>
+              </div>
+            </div>
+          </div>
+      </div>
+      <!-- End MessageModel -->
 <?php $this->load->view('include/template/common_footer'); ?>
 <!-- Bootstrap-notify -->
 <script src="<?php echo base_url('assets/theme/bower_components/datatables.net/js/jquery.dataTables.js'); ?>"></script>
@@ -108,9 +129,13 @@
       var table = null;
       var data = [];
       var nurserys =[];
+      var messages = [];
       var id=0;
+      var status = 0;
+      var messageId = 0;
       $(document).ready(function(){
         getNursery();
+        getMessages();
         table = $('#table_bills').DataTable({
           "paging": true,
           "lengthChange": true,
@@ -167,30 +192,30 @@
               if(aData.is_confirm==1){
                   $('td:eq(4)',nRow).html("Cancelled");
                   $('td:eq(5)',nRow).html(""
-                      +"<button class='btn btn-success' onclick='return ConfirmBill("+iDisplayindex+","+aData.id+",2);'>"
+                      +"<button class='btn btn-success' onclick='return fullImage("+iDisplayindex+","+aData.id+",2);'>"
                       +"<i class='fa fa-check'></i>"
                       +"</button>"
-                      +"<button class='btn btn-danger' disabled onclick='return ConfirmBill("+iDisplayindex+","+aData.id+",1);'>"
+                      +"<button class='btn btn-danger' disabled onclick='return fullImage("+iDisplayindex+","+aData.id+",1);'>"
                       +"<i class='fa fa-close'></i>"
                       +"</button>"
                   +"");
               } else if (aData.is_confirm==2){
                   $('td:eq(4)',nRow).html("Confirmed");
                   $('td:eq(5)',nRow).html(""
-                      +"<button class='btn btn-success' disabled onclick='return ConfirmBill("+iDisplayindex+","+aData.id+",2);'>"
+                      +"<button class='btn btn-success' disabled onclick='return fullImage("+iDisplayindex+","+aData.id+",2);'>"
                       +"<i class='fa fa-check'></i>"
                       +"</button>"
-                      +"<button class='btn btn-danger' onclick='return ConfirmBill("+iDisplayindex+","+aData.id+",1);'>"
+                      +"<button class='btn btn-danger' onclick='return fullImage("+iDisplayindex+","+aData.id+",1);'>"
                       +"<i class='fa fa-close'></i>"
                       +"</button>"
                   +"");
               }else{
                   $('td:eq(4)',nRow).html("Pending");
                   $('td:eq(5)',nRow).html(""
-                      +"<button class='btn btn-success' onclick='return ConfirmBill("+iDisplayindex+","+aData.id+",2);'>"
+                      +"<button class='btn btn-success' onclick='return fullImage("+iDisplayindex+","+aData.id+",2);'>"
                       +"<i class='fa fa-check'></i>"
                       +"</button>"
-                      +"<button class='btn btn-danger' onclick='return ConfirmBill("+iDisplayindex+","+aData.id+",1);'>"
+                      +"<button class='btn btn-danger' onclick='return fullImage("+iDisplayindex+","+aData.id+",1);'>"
                       +"<i class='fa fa-close'></i>"
                       +"</button>"
                   +"");
@@ -198,10 +223,17 @@
           },
         });
     });
-    function ConfirmBill(index,id,status){
-      $("#confirmModal").modal("show");
-      $("#confirmModal").find("[name=id]").attr("value",id);
-      $("#confirmModal").find("[name=status]").attr("value",status);
+    function fullImage(index,aid,stat) {
+      id = aid;
+      status = stat;
+      if(data[index].image_url) {
+        base_url = "<?php echo base_url(); ?>"+data[index].image_url;
+      } else {
+        base_url = "<?php echo base_url('assets/no-image.jpg'); ?>";
+      }
+      $("#fullImageModal").modal("show");
+      $("#fullImageModal").find("[name=id]").attr("value",aid);
+      $("#fullImageModal").find("[name=image]").attr("src",base_url);
       categoryHtml = '';
       categoryHtml='<option value>Select Nursery</option>';
       $.each(nurserys,function(i,e){
@@ -209,25 +241,34 @@
             categoryHtml+='<option value="'+e.name+'">'+e.name+'</option>';
           }
       });
-      $("#confirmModal").find("[name=nurname]").html(categoryHtml);
-      $("#confirmModal").find("[name=nurname]").val(data[index].nurname);
+      $("#fullImageModal").find("[name=nurname]").html(categoryHtml);
+      $("#fullImageModal").find("[name=nurname]").val(data[index].nurname);
+      $("#fullImageModal").find("[name=amount]").html(data[index].amount);
     }
-    function fullImage(index,id) {
-      if(data[index].image_url) {
-        base_url = "<?php echo base_url(); ?>"+data[index].image_url;
-      } else {
-        base_url = "<?php echo base_url('assets/no-image.jpg'); ?>";
-      }
-      $("#fullImageModal").modal("show");
-      $("#fullImageModal").find("[name=image]").attr("src",base_url);
+    function message(){
+      $("#messageModal").modal("show");
+      $(".customMessage").hide();
+      messageHtml = '';
+      messageHtml = '<option value="">Select Message</option>';
+      messageHtml += '<option value="0">Custom Message</option>';
+      $.each(messages,function(i,e){
+          messageHtml +='<option value="'+e.message_id+'">'+e.message+'</option>';
+      });
+      $("#messageModal").find("[name=message]").html(messageHtml);
+      $("#messageModal").find("[name=message]").on('change', function () {
+          if(this.value == 0 && this.value != ''){
+              $(".customMessage").show();
+          } else {
+              $(".customMessage").hide();
+              customMessage = $("#messageModal").find("[name=message]").find("option:selected").text();
+          }
+          messageId = this.value;
+      });
     }
-    function ajaxCall() {
-      var id=-1;
-      id=$("#confirmModal").find("[name=id]").val();
-      value=$("#confirmModal").find("[name=status]").val();
-      nurname = $("#confirmModal").find("[name=nurname]").val();
+    function ajaxCall(status) {
+      nurname = $("#fullImageModal").find("[name=nurname]").val();
       $.post("<?php echo site_url('bills/confirm/'); ?>"+id,{
-          is_confirm : value,
+          is_confirm : status,
           nurname : nurname
       })
       .done(function(result){
@@ -235,7 +276,7 @@
           if(result.success==true){
               table.ajax.reload();
           }
-          $("#confirmModal").modal("hide");
+          $("#fullImageModal").modal("hide");
       });
     }
     function getNursery() {
@@ -249,6 +290,44 @@
             cache: false,
             contentType: false,
             processData: false
+        });
+    }
+    function getMessages() {
+        $.ajax({
+            url: "<?php echo site_url('bills/getMessages'); ?>",
+            type: 'POST',
+            success: function (data) {
+              data = JSON.parse(data);
+              messages = data.data;
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+    }
+    function sendMessage(){
+        if(messageId == ''){
+            alert('Please select any message to send.');
+            return false;
+        } else if(messageId == '0'){
+            customMessage = $("#messageModal").find("[name=custom]").val()
+            if(customMessage == ''){
+                alert('Message cannot be blank.');
+                return false;
+            }
+        }
+        var data = {
+          messageId : messageId,
+          message : customMessage
+        };
+        $.post("<?php echo site_url('bills/sendMessage/'); ?>"+id,data)
+        .done(function(result){
+            data = JSON.parse(result);
+            alert(data.msg);
+            if(data.success){
+                $("#messageModal").modal("hide");
+                ajaxCall(1);
+            }
         });
     }
     </script>

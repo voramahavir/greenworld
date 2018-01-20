@@ -133,4 +133,102 @@ class BillsModel extends CI_Model {
         echo json_encode(array("success" => $success, "msg" => $msg));
         exit();
     }
+
+    public function getMessages()
+    {
+        $search = array('value' => '');
+        if (isset($_POST['search'])) {
+            $search = $_POST['search'];
+        }
+        if (isset($search['value'])) {
+            $search = $search['value'];
+        }
+        $start = 0;
+        if (isset($_POST['start'])) {
+            $start = $_POST['start'];
+        }
+        $length = 10;
+        if (isset($_POST['length'])) {
+            $length = $_POST['length'];
+        }
+        $draw = 1;
+        if (isset($_POST['draw'])) {
+            $draw = $_POST['draw'];
+        }
+        $output = array("code" => 0,
+            'draw' => $draw,
+            'recordsTotal' => 0,
+            'recordsFiltered' => 0,
+            'search' => $search,
+            'success' => true,
+            'msg' => 'Data fetched successfully.'
+        );
+        $this->db->select('*');
+        $output['data'] = $this->db->get('cancel_reasons')->result();
+        $output['recordsTotal']=$this->db->get('cancel_reasons')->num_rows();
+        $output['recordsFiltered']=$output['recordsTotal'];
+        if (!empty($output['data'])) {
+            $output['code'] = 1;
+        }
+        echo json_encode($output);
+        exit;
+    }
+
+    function sendMessage($id=''){
+        $success = false;
+        $msg = '';
+        $billData = $this->db->select('*')->where('id',$id)->get('bills')->first_row();
+        if($billData->id){
+            $userData = $this->db->select('*')->where('user_id',$billData->user_id)->get('users')->first_row();
+            if($userData->phone_no){
+                $this->send_sms($_POST['message'],$userData->phone_no);
+                $data = array('bill_id'=>$id,'message'=>$_POST['message']);
+                $count = $this->db->insert('user_reasons_link',$data);
+                $success = true;
+                $msg = "Message sent successfully.";
+            } else {
+                $msg = "User does not exist.";
+            }
+        } else {
+            $msg = "Bill data does not exist.";
+        }
+        echo json_encode(array("success" => $success, "msg" => $msg));
+        exit();
+    }
+
+    public function send_sms($message='', $mobileNumber)
+    {        
+        //Your authentication key
+        $authKey = "190629AOn1V8cU4Y55a47ef98";
+        //Sender ID,While using route4 sender id should be 6 characters long.
+        $senderId = "REGREE";
+        //Your message to send, Add URL encoding here.
+        $message = urlencode($message);
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => "http://api.msg91.com/api/v2/sendsms",
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => "",
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 30,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => "POST",
+          CURLOPT_POSTFIELDS => "{ \"sender\": \"REGREN\", \"route\": \"4\", \"country\": \"91\", \"sms\": [ { \"message\": \"$message\", \"to\": [ \"$mobileNumber\" ] } ] }",
+          CURLOPT_SSL_VERIFYHOST => 0,
+          CURLOPT_SSL_VERIFYPEER => 0,
+          CURLOPT_HTTPHEADER => array(
+            "authkey: " . $authKey,
+            "content-type: application/json"
+          ),
+        ));
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+        if ($err) {
+          return "cURL Error #:" . $err;
+        } else {
+          return $response;
+        }
+        return true;
+    }
 }

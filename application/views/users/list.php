@@ -93,6 +93,7 @@
           "paging": true,
           "lengthChange": true,
           "searching": true,
+          "scrollX": true,
           "ordering": true,
           "responsive": true,
           "autoWidth": false,

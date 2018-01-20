@@ -156,6 +156,7 @@
         table = $('#table_plant_category').DataTable({
           "paging": true,
           "lengthChange": true,
+          "scrollX": true,
           "searching": true,
           "ordering": true,
           "responsive": true,
