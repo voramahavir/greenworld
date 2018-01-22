@@ -244,6 +244,16 @@
       $("#fullImageModal").find("[name=nurname]").html(categoryHtml);
       $("#fullImageModal").find("[name=nurname]").val(data[index].nurname);
       $("#fullImageModal").find("[name=amount]").html(data[index].amount);
+      if(data[index].is_confirm == 1) {
+        $("#fullImageModal").find("[name=cancel]").prop('disabled', false);
+        $("#fullImageModal").find("[name=confirm]").prop('disabled', true);
+      } else if (data[index].is_confirm == 2) {
+        $("#fullImageModal").find("[name=cancel]").prop('disabled', true);
+        $("#fullImageModal").find("[name=confirm]").prop('disabled', false);
+      } else {
+        $("#fullImageModal").find("[name=cancel]").prop('disabled', false);
+        $("#fullImageModal").find("[name=confirm]").prop('disabled', false);
+      }
     }
     function message(){
       $("#messageModal").modal("show");
