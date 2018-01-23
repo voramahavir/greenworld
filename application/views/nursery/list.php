@@ -345,7 +345,8 @@
         });
         $(".plant_categories").select2({
             closeOnSelect: false,
-            placeholder: 'Select Plant Categories'
+            placeholder: 'Select Plant Categories',
+            tags:true
         });
         $.ajax({
             url: "<?php echo site_url('plant_category/get'); ?>",

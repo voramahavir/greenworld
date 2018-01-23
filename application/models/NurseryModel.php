@@ -50,7 +50,26 @@ class NurseryModel extends CI_Model {
                         }
                         $this->db->insert_batch("plant_nursery_link",$data);
                     }
-                    if($plant_categories != ''){
+                    if($plant_categories != ''){    
+                        $sql = "SELECT `name` FROM `plant_category`";
+                        $result = $this->db->query($sql)->result_array();
+                        $arr = array_map (function($value){
+                            return $value['name'];
+                        },$result);
+                        $new_categories = [];
+                        for ($i=0; $i < count($plant_categories); $i++) { 
+                            if(!in_array($plant_categories[$i], $result)){
+                                $count = $this->db->insert('plant_category',array('name'=>$plant_categories[$i]));
+                                if($count > 0){
+                                    $plant_categories = array_replace($plant_categories,
+                                        array_fill_keys(
+                                            array_keys($plant_categories, $plant_categories[$i]),
+                                            $this->db->insert_id()
+                                        )
+                                    );
+                                }
+                            }
+                        }                    
                         $data = array();
                         for ($i=0; $i < count($plant_categories); $i++) { 
                             $arr = array('category_id' => $plant_categories[$i], 'nursery_id' => $nursery_id);
@@ -205,6 +224,25 @@ class NurseryModel extends CI_Model {
                     $this->db->insert_batch("plant_nursery_link",$data);
                 }
                 if($plant_categories != ''){
+                    $sql = "SELECT `name` FROM `plant_category`";
+                    $result = $this->db->query($sql)->result_array();
+                    $arr = array_map (function($value){
+                        return $value['name'];
+                    },$result);
+                    $new_categories = [];
+                    for ($i=0; $i < count($plant_categories); $i++) { 
+                        if(!in_array($plant_categories[$i], $result)){
+                            $count = $this->db->insert('plant_category',array('name'=>$plant_categories[$i]));
+                            if($count > 0){
+                                $plant_categories = array_replace($plant_categories,
+                                    array_fill_keys(
+                                        array_keys($plant_categories, $plant_categories[$i]),
+                                        $this->db->insert_id()
+                                    )
+                                );
+                            }
+                        }
+                    } 
                     $data = array();
                     for ($i=0; $i < count($plant_categories); $i++) { 
                         $arr = array('category_id' => $plant_categories[$i], 'nursery_id' => $id);
