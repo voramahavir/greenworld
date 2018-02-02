@@ -124,7 +124,7 @@ class CodeModel extends CI_Model {
     {
         $data = array();
         $success = false;
-        $msg = checkParams($_POST);
+        $msg = checkParams($_POST,'code,user_id');
         $reward_points = 0;
         $type = 0;
         if (empty($msg)) {
