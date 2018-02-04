@@ -375,7 +375,7 @@
           "autoWidth": false,
           "pageLength": 10,
           "ajax": {
-            "url": "<?php echo site_url('articles/get'); ?>",
+            "url": "<?php echo site_url('articles/get/-1'); ?>",
             "type": "POST"
           },
           "columns": [
