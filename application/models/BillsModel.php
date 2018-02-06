@@ -37,7 +37,7 @@ class BillsModel extends CI_Model {
                         $this->db->insert("bills",$_POST);
                         if($this->db->insert_id()){
                             $success = true;
-                            $msg = "Bill added successfully.";
+                            $msg = "Points will be issued in 48 hours.";
                         }else{
                             $msg = "Oops! error adding bill.";
                         }

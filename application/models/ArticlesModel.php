@@ -104,9 +104,11 @@ class ArticlesModel extends CI_Model {
             $this->db->where("a.is_active",1);
         }
         if(!empty($search)){$this->db->like("a.description",$search);}
-        $this->db->select('id,description,image_url,url,title,source,submitted_by,designation,video_url,image_type,video_type,a.is_active,a.user_id,a.created_at,CONCAT(u.first_name, " ",u.last_name) as user_fullname,u.profile_pic as user_profile_pic');
+        $this->db->select('count(up_down) as upvotes,a.id,description,image_url,url,title,source,submitted_by,designation,video_url,image_type,video_type,a.is_active,a.user_id,a.created_at,CONCAT(u.first_name, " ",u.last_name) as user_fullname,u.profile_pic as user_profile_pic');
         $this->db->join('users as u','u.user_id = a.user_id', 'left');
+        $this->db->join('upvotes as up','up.article_id = a.id and up.up_down = 1', 'left');
         $this->db->order_by('a.created_at','DESC'); 
+        $this->db->group_by('a.id'); 
         $output['data'] = $this->db->get('articles as a')->result();
         if(!empty($search)){$this->db->like("a.description",$search);}
         // if($id>0){
